@@ -6,6 +6,16 @@ public class EnderecoDTO {
     private String numero;
     private String complemento;
 
+    public EnderecoDTO() {
+    }
+    
+    public EnderecoDTO(Long id, String cep, String numero, String complemento) {
+        this.id = id;
+        this.cep = cep;
+        this.numero = numero;
+        this.complemento = complemento;
+    }
+
     public Long getId() {
         return id;
     }

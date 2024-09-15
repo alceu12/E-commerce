@@ -3,7 +3,7 @@ package com.Ecommerce.Ecommerce.dto;
 public class UsuarioDTO {
 
     private Long id;
-    private String name;
+    private String nome;
     private String email;
     private String password;
     private EnderecoDTO enderecoDTO;
@@ -12,9 +12,12 @@ public class UsuarioDTO {
     public UsuarioDTO() {
     }
 
-    public UsuarioDTO(String name, String email, EnderecoDTO enderecoDTO, FuncaoDTO funcaoDTO) {
-        this.name = name;
+    public UsuarioDTO(Long id, String nome, String email, String password, EnderecoDTO enderecoDTO,
+            FuncaoDTO funcaoDTO) {
+        this.id = id;
+        this.nome = nome;
         this.email = email;
+        this.password = password;
         this.enderecoDTO = enderecoDTO;
         this.funcaoDTO = funcaoDTO;
     }
@@ -27,12 +30,12 @@ public class UsuarioDTO {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNome() {
+        return nome;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getEmail() {

@@ -8,7 +8,8 @@ public class FuncaoDTO {
     public FuncaoDTO() {
     }
 
-    public FuncaoDTO( String nome) {
+    public FuncaoDTO(Long id, String nome) {
+        this.id = id;
         this.nome = nome;
     }
 
