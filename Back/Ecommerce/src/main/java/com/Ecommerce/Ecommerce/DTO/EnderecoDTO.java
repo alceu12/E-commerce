@@ -1,4 +1,4 @@
-package com.Ecommerce.Ecommerce.DTO;
+package com.Ecommerce.Ecommerce.dto;
 
 public class EnderecoDTO {
     private Long id;
