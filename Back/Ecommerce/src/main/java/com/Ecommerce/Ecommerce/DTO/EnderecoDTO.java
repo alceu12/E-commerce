@@ -1,14 +1,6 @@
-package com.Ecommerce.Ecommerce.entity;
+package com.Ecommerce.Ecommerce.DTO;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-public class Endereco {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class EnderecoDTO {
     private Long id;
     private String cep;
     private String numero;
