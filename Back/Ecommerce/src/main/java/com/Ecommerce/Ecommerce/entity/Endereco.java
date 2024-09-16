@@ -17,6 +17,7 @@ public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String cep;
+    private String rua;
     private String numero;
     private String complemento;
 

@@ -38,8 +38,10 @@ public class EnderecoService {
     public EnderecoDTO atualizarEndereco(Long id, EnderecoDTO enderecoDTO) {
         Endereco enderecoExistente = enderecoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Endereco não encontrado"));
-        enderecoExistente.setNome(enderecoDTO.getNome());
-        enderecoExistente.setCodigo(enderecoDTO.getCodigo());
+        enderecoExistente.setCep(enderecoDTO.getCep());
+        enderecoExistente.setRua(enderecoDTO.getRua());
+        enderecoExistente.setNumero(enderecoDTO.getRua());
+        enderecoExistente.setComplemento(enderecoDTO.getComplemento());
         Endereco enderecoAtualizado = enderecoRepository.save(enderecoExistente);
         return EnderecoMapper.toDTO(enderecoAtualizado);
     }
