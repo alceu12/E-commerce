@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.Ecommerce.Ecommerce.dto.FuncaoDTO;
 import com.Ecommerce.Ecommerce.service.FuncaoService;
 
+@RestController
+@RequestMapping("/funcoes")
 public class FuncaoController {
     @Autowired
     private FuncaoService funcaoService;

@@ -25,7 +25,7 @@ public class EnderecoMapper {
         Endereco endereco = new Endereco();
         endereco.setId(dto.getId());
         endereco.setCep(dto.getCep());
-        endereco.setCep(dto.getRua());
+        endereco.setRua(dto.getRua());
         endereco.setNumero(dto.getNumero());
         endereco.setComplemento(dto.getComplemento());
 

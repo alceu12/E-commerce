@@ -40,7 +40,7 @@ public class EnderecoService {
                 .orElseThrow(() -> new RuntimeException("Endereco não encontrado"));
         enderecoExistente.setCep(enderecoDTO.getCep());
         enderecoExistente.setRua(enderecoDTO.getRua());
-        enderecoExistente.setNumero(enderecoDTO.getRua());
+        enderecoExistente.setNumero(enderecoDTO.getNumero());
         enderecoExistente.setComplemento(enderecoDTO.getComplemento());
         Endereco enderecoAtualizado = enderecoRepository.save(enderecoExistente);
         return EnderecoMapper.toDTO(enderecoAtualizado);
