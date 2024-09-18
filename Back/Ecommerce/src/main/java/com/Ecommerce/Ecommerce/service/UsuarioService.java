@@ -84,6 +84,20 @@ public class UsuarioService {
         usuarioExistente.setNome(usuarioDTO.getNome());
         usuarioExistente.setEmail(usuarioDTO.getEmail());
         usuarioExistente.setPassword(usuarioDTO.getPassword());
+
+        if (usuarioDTO.getEnderecoDTO() != null && usuarioDTO.getEnderecoDTO().getId() != null) {
+            Optional<Endereco> enderecoOptional = enderecoRepository.findById(usuarioDTO.getEnderecoDTO().getId());
+            enderecoOptional.ifPresent(usuarioExistente::setEndereco);
+        }    
+        if (usuarioDTO.getFuncaoDTO() != null && usuarioDTO.getFuncaoDTO().getId() != null) {
+            Optional<Funcao> funcaoOptional = funcaoRepository.findById(usuarioDTO.getFuncaoDTO().getId());
+            funcaoOptional.ifPresent(usuarioExistente::setFuncao);
+        }
+        if (usuarioDTO.getStatusDTO() != null && usuarioDTO.getStatusDTO().getId() != null) {
+            Optional<Status> statusOptional = statusRepository.findById(usuarioDTO.getStatusDTO().getId());
+            statusOptional.ifPresent(usuarioExistente::setStatus);
+        }
+
         Usuario usuarioAtualizado = usuarioRepository.save(usuarioExistente);
         return UsuarioMapper.toDTO(usuarioAtualizado);
     }
