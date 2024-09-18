@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
 import com.Ecommerce.Ecommerce.entity.Endereco;
 import com.Ecommerce.Ecommerce.entity.Funcao;
+import com.Ecommerce.Ecommerce.entity.Status;
 import com.Ecommerce.Ecommerce.entity.Usuario;
 import com.Ecommerce.Ecommerce.repository.EnderecoRepository;
 import com.Ecommerce.Ecommerce.repository.FuncaoRepository;
+import com.Ecommerce.Ecommerce.repository.StatusRepository;
 import com.Ecommerce.Ecommerce.repository.UsuarioRepository;
 import com.Ecommerce.Ecommerce.util.UsuarioMapper;
 
@@ -26,6 +28,9 @@ public class UsuarioService {
 
     @Autowired
     private FuncaoRepository funcaoRepository;
+
+    @Autowired
+    private StatusRepository statusRepository;
 
     public UsuarioDTO criarUsuario(UsuarioDTO usuarioDTO) {
         // Converter DTO para entidade usuario
@@ -46,6 +51,14 @@ public class UsuarioService {
                 usuario.setFuncao(funcaoOptional.get());
             } else {
                 throw new RuntimeException("Funcao com ID " + usuario.getFuncao().getId() + " não encontrado.");
+            }
+        }
+        if (usuario.getStatus() != null && usuario.getStatus().getId() != null) {
+            Optional<Status> statusOptional = statusRepository.findById(usuario.getStatus().getId());
+            if (statusOptional.isPresent()) {
+                usuario.setStatus(statusOptional.get());
+            } else {
+                throw new RuntimeException("Funcao com ID " + usuario.getStatus().getId() + " não encontrado.");
             }
         }
         usuario = usuarioRepository.save(usuario);
@@ -69,6 +82,22 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
 
         usuarioExistente.setNome(usuarioDTO.getNome());
+        usuarioExistente.setEmail(usuarioDTO.getEmail());
+        usuarioExistente.setPassword(usuarioDTO.getPassword());
+
+        if (usuarioDTO.getEnderecoDTO() != null && usuarioDTO.getEnderecoDTO().getId() != null) {
+            Optional<Endereco> enderecoOptional = enderecoRepository.findById(usuarioDTO.getEnderecoDTO().getId());
+            enderecoOptional.ifPresent(usuarioExistente::setEndereco);
+        }    
+        if (usuarioDTO.getFuncaoDTO() != null && usuarioDTO.getFuncaoDTO().getId() != null) {
+            Optional<Funcao> funcaoOptional = funcaoRepository.findById(usuarioDTO.getFuncaoDTO().getId());
+            funcaoOptional.ifPresent(usuarioExistente::setFuncao);
+        }
+        if (usuarioDTO.getStatusDTO() != null && usuarioDTO.getStatusDTO().getId() != null) {
+            Optional<Status> statusOptional = statusRepository.findById(usuarioDTO.getStatusDTO().getId());
+            statusOptional.ifPresent(usuarioExistente::setStatus);
+        }
+
         Usuario usuarioAtualizado = usuarioRepository.save(usuarioExistente);
         return UsuarioMapper.toDTO(usuarioAtualizado);
     }

@@ -25,12 +25,16 @@ public class Usuario {
     private String email;
     private String password;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "endereco_id", referencedColumnName = "id")
     private Endereco endereco;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "funcao_id", referencedColumnName = "id")
     private Funcao funcao;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private Status status;
 
 }
