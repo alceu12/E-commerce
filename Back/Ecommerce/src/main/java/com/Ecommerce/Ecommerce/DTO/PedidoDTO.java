@@ -1,5 +1,7 @@
 package com.Ecommerce.Ecommerce.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PedidoDTO {
+
     private Long id;
     private double total;
     private StatusDTO statusDTO;
-    private ItemPedidoDTO itemPedidoDTO;
+    private List<ItemPedidoDTO> itemPedidoDTO;
     private UsuarioDTO usuarioDTO;
+    
 }
