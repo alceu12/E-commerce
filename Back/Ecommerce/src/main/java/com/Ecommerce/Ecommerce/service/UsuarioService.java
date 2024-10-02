@@ -43,7 +43,6 @@ public class UsuarioService {
         }
         // Converter DTO para entidade usuario
         Usuario usuario = UsuarioMapper.toEntity(usuarioDTO);
-        UsuarioDTO usuarioSalvoDTO = UsuarioMapper.toDTO(usuarioRepository.save(usuario));
 
         // Buscar e associar o endereco usando o ID
         if (usuario.getEndereco() != null && usuario.getEndereco().getId() != null) {
@@ -70,6 +69,9 @@ public class UsuarioService {
                 throw new RuntimeException("Funcao com ID " + usuario.getStatus().getId() + " não encontrado.");
             }
         }
+
+        UsuarioDTO usuarioSalvoDTO = UsuarioMapper.toDTO(usuarioRepository.save(usuario));
+        
         usuario = usuarioRepository.save(usuario);
         return ResponseEntity.ok(usuarioSalvoDTO);
     }
