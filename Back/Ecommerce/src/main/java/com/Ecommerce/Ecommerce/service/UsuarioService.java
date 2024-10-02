@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
@@ -17,6 +18,9 @@ import com.Ecommerce.Ecommerce.repository.FuncaoRepository;
 import com.Ecommerce.Ecommerce.repository.StatusRepository;
 import com.Ecommerce.Ecommerce.repository.UsuarioRepository;
 import com.Ecommerce.Ecommerce.util.UsuarioMapper;
+import com.Ecommerce.Ecommerce.util.ValidaEmail;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class UsuarioService {
@@ -32,9 +36,14 @@ public class UsuarioService {
     @Autowired
     private StatusRepository statusRepository;
 
-    public UsuarioDTO criarUsuario(UsuarioDTO usuarioDTO) {
+    public ResponseEntity<UsuarioDTO> criarUsuario(UsuarioDTO usuarioDTO, HttpServletResponse response) {
+        // Validar o email
+        if (!ValidaEmail.validarCaracterArroba(usuarioDTO.getEmail())){
+            return ResponseEntity.status(422).build();
+        }
         // Converter DTO para entidade usuario
         Usuario usuario = UsuarioMapper.toEntity(usuarioDTO);
+        UsuarioDTO usuarioSalvoDTO = UsuarioMapper.toDTO(usuarioRepository.save(usuario));
 
         // Buscar e associar o endereco usando o ID
         if (usuario.getEndereco() != null && usuario.getEndereco().getId() != null) {
@@ -62,7 +71,7 @@ public class UsuarioService {
             }
         }
         usuario = usuarioRepository.save(usuario);
-        return UsuarioMapper.toDTO(usuario);
+        return ResponseEntity.ok(usuarioSalvoDTO);
     }
 
     public List<UsuarioDTO> obterTodosUsuarios() {
