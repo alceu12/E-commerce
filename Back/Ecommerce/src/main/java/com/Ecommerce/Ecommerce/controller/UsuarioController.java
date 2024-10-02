@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
 import com.Ecommerce.Ecommerce.service.UsuarioService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -24,9 +26,8 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    public UsuarioDTO criarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
-        return usuarioService.criarUsuario(usuarioDTO);
-
+    public ResponseEntity<UsuarioDTO> criarUsuario(@RequestBody UsuarioDTO usuarioDTO, HttpServletResponse response){
+        return usuarioService.criarUsuario(usuarioDTO, response);
     }
 
     @GetMapping

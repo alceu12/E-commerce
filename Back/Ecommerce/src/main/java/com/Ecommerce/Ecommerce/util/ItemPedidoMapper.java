@@ -1,5 +1,9 @@
 package com.Ecommerce.Ecommerce.util;
 
+import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
+
 import com.Ecommerce.Ecommerce.dto.ProdutoDTO;
 import com.Ecommerce.Ecommerce.dto.ItemPedidoDTO;
 import com.Ecommerce.Ecommerce.entity.Produto;
@@ -20,6 +24,23 @@ public class ItemPedidoMapper {
             produtoDTO
         );
     }
+
+    public static List<ItemPedidoDTO> toListDTO(List<ItemPedido> itemPedidos) {
+    if (itemPedidos == null || itemPedidos.isEmpty()) {
+        return Collections.emptyList();
+    }
+
+    return itemPedidos.stream().map(itemPedido -> {
+        ProdutoDTO produtoDTO = ProdutoMapper.toDTO(itemPedido.getProduto());
+
+        return new ItemPedidoDTO(
+            itemPedido.getId(),
+            itemPedido.getQuantidade(),
+            itemPedido.getPrecoUnitario(),
+            produtoDTO
+        );
+    }).collect(Collectors.toList());
+}
 
     public static ItemPedido toEntity(ItemPedidoDTO dto) {
         if (dto == null) {
