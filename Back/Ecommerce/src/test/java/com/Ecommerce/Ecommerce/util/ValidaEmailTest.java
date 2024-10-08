@@ -53,8 +53,8 @@ public class ValidaEmailTest {
         assertNull(emailNulo);
 
         //Verifica se o objeto não é nulo
-        //Verifica se o objeto cliente não é nulo
-        //passa se o cliente não for nulo
+        //Verifica se o objeto usuario não é nulo
+        //passa se o usuario não for nulo
         assertNotNull(usuarioDTO);
         
         //Permite agrupar multiplas asserções, executando todas elas e reportando todas as falhas.
