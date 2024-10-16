@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/listas-desejos")
+@RequestMapping("/lista-desejos")
 public class ListaDesejosController {
 
     @Autowired
