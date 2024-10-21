@@ -9,12 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PedidoDTO {
-
+public class ListaDesejosDTO {
     private Long id;
-    private double total;
-    private String statusPedido;
-    private List<ItemPedidoDTO> itemPedidoDTO;
     private UsuarioDTO usuarioDTO;
-    
+    private List<ProdutoDTO> produtos;
 }

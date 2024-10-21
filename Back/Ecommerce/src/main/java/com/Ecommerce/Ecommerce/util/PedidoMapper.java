@@ -17,14 +17,14 @@ public class PedidoMapper {
             return null;
         }
 
-        StatusDTO statusDTO = StatusMapper.toDTO(pedido.getStatus());
+        PedidoDTO.setStatusPedido(pedido.getStatusPedido().name());
         List<ItemPedidoDTO> itemPedidoDTO = ItemPedidoMapper.toListDTO(pedido.getItemPedido());
         UsuarioDTO usuarioDTO = UsuarioMapper.toDTO(pedido.getUsuario());
 
         return new PedidoDTO(
             pedido.getId(),
             pedido.getTotal(),
-            statusDTO,
+            statusPedido,
             itemPedidoDTO,
             usuarioDTO
         );
@@ -42,7 +42,7 @@ public class PedidoMapper {
         if (dto.getStatusDTO() != null && dto.getStatusDTO().getId() != null) {
             Status status = new Status();
             status.setId(dto.getStatusDTO().getId());
-            pedido.setStatus(status);
+            pedido.setStatusPedido(status);
         }
 
         if (dto.getUsuarioDTO() != null && dto.getUsuarioDTO().getId() != null) {

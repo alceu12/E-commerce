@@ -31,12 +31,12 @@ public class PedidoService {
         Pedido pedido = PedidoMapper.toEntity(pedidoDTO);
 
         // Buscar e associar o status usando o ID
-        if (pedido.getStatus() != null && pedido.getStatus().getId() != null) {
-            Optional<Status> statusOptional = statusRepository.findById(pedido.getStatus().getId());
+        if (pedido.getStatusPedido() != null && pedido.getStatusPedido().getId() != null) {
+            Optional<Status> statusOptional = statusRepository.findById(pedido.getStatusPedido().getId());
             if (statusOptional.isPresent()) {
-                pedido.setStatus(statusOptional.get());
+                pedido.setStatusPeidido(statusOptional.get());
             } else {
-                throw new RuntimeException("Status com ID " + pedido.getStatus().getId() + " não encontrado.");
+                throw new RuntimeException("Status com ID " + pedido.getStatusPedido().getId() + " não encontrado.");
             }
         }
 
@@ -73,7 +73,7 @@ public class PedidoService {
 
         if (pedidoDTO.getStatusDTO() != null && pedidoDTO.getStatusDTO().getId() != null) {
             Optional<Status> statusOptional = statusRepository.findById(pedidoDTO.getStatusDTO().getId());
-            statusOptional.ifPresent(pedidoExistente::setStatus);
+            statusOptional.ifPresent(pedidoExistente::setStatusPedido);
         }
 
         if (pedidoDTO.getUsuarioDTO() != null && pedidoDTO.getUsuarioDTO().getId() != null) {
