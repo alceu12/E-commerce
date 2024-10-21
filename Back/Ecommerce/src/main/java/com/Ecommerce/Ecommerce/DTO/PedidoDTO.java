@@ -13,7 +13,7 @@ public class PedidoDTO {
 
     private Long id;
     private double total;
-    private StatusDTO statusDTO;
+    private String statusPedido;
     private List<ItemPedidoDTO> itemPedidoDTO;
     private UsuarioDTO usuarioDTO;
     

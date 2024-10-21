@@ -27,7 +27,7 @@ public class Pedido {
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private Status status;
+    private StatusPedido statusPedido;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
