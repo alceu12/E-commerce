@@ -1,13 +1,12 @@
 package com.Ecommerce.Ecommerce.util;
 
-import com.Ecommerce.Ecommerce.dto.StatusDTO;
 import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
 
 import java.util.List;
 
 import com.Ecommerce.Ecommerce.dto.ItemPedidoDTO;
 import com.Ecommerce.Ecommerce.dto.PedidoDTO;
-import com.Ecommerce.Ecommerce.entity.Status;
+import com.Ecommerce.Ecommerce.entity.StatusPedido;
 import com.Ecommerce.Ecommerce.entity.Usuario;
 import com.Ecommerce.Ecommerce.entity.Pedido;
 
@@ -17,14 +16,13 @@ public class PedidoMapper {
             return null;
         }
 
-        PedidoDTO.setStatusPedido(pedido.getStatusPedido().name());
         List<ItemPedidoDTO> itemPedidoDTO = ItemPedidoMapper.toListDTO(pedido.getItemPedido());
         UsuarioDTO usuarioDTO = UsuarioMapper.toDTO(pedido.getUsuario());
 
         return new PedidoDTO(
             pedido.getId(),
             pedido.getTotal(),
-            statusPedido,
+            pedido.getStatusPedido().name(),
             itemPedidoDTO,
             usuarioDTO
         );
@@ -38,11 +36,8 @@ public class PedidoMapper {
         Pedido pedido = new Pedido();
         pedido.setId(dto.getId());
         pedido.setTotal(dto.getTotal());
-
-        if (dto.getStatusDTO() != null && dto.getStatusDTO().getId() != null) {
-            Status status = new Status();
-            status.setId(dto.getStatusDTO().getId());
-            pedido.setStatusPedido(status);
+       if (dto.getStatusPedido() != null) {
+            pedido.setStatusPedido(StatusPedido.valueOf(dto.getStatusPedido()));
         }
 
         if (dto.getUsuarioDTO() != null && dto.getUsuarioDTO().getId() != null) {

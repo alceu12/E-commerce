@@ -15,5 +15,5 @@ public class UsuarioDTO {
     private String password;
     private EnderecoDTO enderecoDTO;
     private FuncaoDTO funcaoDTO;
-    private StatusDTO statusDTO;
+    private String statusUser;
 }

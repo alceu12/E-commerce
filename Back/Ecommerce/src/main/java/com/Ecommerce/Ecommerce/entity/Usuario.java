@@ -1,12 +1,6 @@
 package com.Ecommerce.Ecommerce.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,8 +27,7 @@ public class Usuario {
     @JoinColumn(name = "funcao_id", referencedColumnName = "id")
     private Funcao funcao;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private Status status;
+    @Enumerated(EnumType.STRING)
+    private StatusUser statusUser;
 
 }

@@ -2,11 +2,10 @@ package com.Ecommerce.Ecommerce.util;
 
 import com.Ecommerce.Ecommerce.dto.EnderecoDTO;
 import com.Ecommerce.Ecommerce.dto.FuncaoDTO;
-import com.Ecommerce.Ecommerce.dto.StatusDTO;
 import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
 import com.Ecommerce.Ecommerce.entity.Endereco;
 import com.Ecommerce.Ecommerce.entity.Funcao;
-import com.Ecommerce.Ecommerce.entity.Status;
+import com.Ecommerce.Ecommerce.entity.StatusUser;
 import com.Ecommerce.Ecommerce.entity.Usuario;
 
 public class UsuarioMapper {
@@ -18,16 +17,16 @@ public class UsuarioMapper {
 
         EnderecoDTO enderecoDTO = EnderecoMapper.toDTO(usuario.getEndereco());
         FuncaoDTO funcaoDTO = FuncaoMapper.toDTO(usuario.getFuncao());
-        StatusDTO statusDTO = StatusMapper.toDTO(usuario.getStatus());
+
 
         return new UsuarioDTO(
-            usuario.getId(),
-            usuario.getNome(),
-            usuario.getEmail(),
-            usuario.getPassword(),
-            enderecoDTO,
-            funcaoDTO,
-            statusDTO
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getPassword(),
+                enderecoDTO,
+                funcaoDTO,
+                usuario.getStatusUser().name()
 
         );
     }
@@ -55,13 +54,12 @@ public class UsuarioMapper {
             usuario.setFuncao(funcao);
         }
 
-        if (dto.getStatusDTO() != null && dto.getStatusDTO().getId() != null) {
-            Status status = new Status();
-            status.setId(dto.getStatusDTO().getId());
-            usuario.setStatus(status);
+        if (dto.getStatusUser() != null) {
+            usuario.setStatusUser(StatusUser.valueOf(dto.getStatusUser()));
+
+            return usuario;
         }
 
         return usuario;
     }
-
 }
