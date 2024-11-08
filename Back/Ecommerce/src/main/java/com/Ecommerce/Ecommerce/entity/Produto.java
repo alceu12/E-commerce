@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,9 @@ public class Produto {
     private String descricao;
     private double valor;
     private int estoque;
-    private List<String> imagens;
+
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
+    private List<Imagem> imagens;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "categoria_id", referencedColumnName = "id")

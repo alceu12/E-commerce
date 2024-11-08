@@ -1,16 +1,21 @@
 package com.Ecommerce.Ecommerce.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.Ecommerce.Ecommerce.dto.ImagemDTO;
 import com.Ecommerce.Ecommerce.dto.ProdutoDTO;
 import com.Ecommerce.Ecommerce.entity.Categoria;
+import com.Ecommerce.Ecommerce.entity.Imagem;
 import com.Ecommerce.Ecommerce.entity.Produto;
 import com.Ecommerce.Ecommerce.repository.CategoriaRepository;
 import com.Ecommerce.Ecommerce.repository.ProdutoRepository;
+import com.Ecommerce.Ecommerce.util.ImagemMapper;
 import com.Ecommerce.Ecommerce.util.ProdutoMapper;
 
 @Service
@@ -59,7 +64,9 @@ public class ProdutoService {
         produtoExistente.setDescricao(produtoDTO.getDescricao());
         produtoExistente.setValor(produtoDTO.getValor());
         produtoExistente.setEstoque(produtoDTO.getEstoque());
-        produtoExistente.setImagens(produtoDTO.getImagens());
+        produtoExistente.setImagens(produtoDTO.getImagens().stream()
+                .map(ImagemMapper::toEntity)
+                .collect(Collectors.toList()));
 
         if (produtoDTO.getCategoriaDTO() != null && produtoDTO.getCategoriaDTO().getId() != null) {
             Optional<Categoria> categoriaOptional = categoriaRepository.findById(produtoDTO.getCategoriaDTO().getId());
@@ -77,6 +84,25 @@ public class ProdutoService {
             return true;
         } else {
             return false;
+        }
+    }
+    public String adicionarImagemAoProduto(Long produtoId, MultipartFile file) {
+        try {
+            Produto produto = produtoRepository.findById(produtoId)
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+            Imagem imagem = new Imagem();
+            imagem.setDados(file.getBytes());
+            imagem.setProduto(produto);
+
+            produto.getImagens().add(imagem);
+            produtoRepository.save(produto);
+
+            return "Imagem enviada com sucesso";
+        } catch (IOException e) {
+            return "Erro ao processar o arquivo de imagem: " + e.getMessage();
+        } catch (RuntimeException e) {
+            return e.getMessage();
         }
     }
 }

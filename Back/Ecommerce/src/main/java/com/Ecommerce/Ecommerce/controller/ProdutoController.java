@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.Ecommerce.Ecommerce.dto.ImagemDTO;
 import com.Ecommerce.Ecommerce.dto.ProdutoDTO;
 import com.Ecommerce.Ecommerce.service.ProdutoService;
 
@@ -51,5 +55,11 @@ public class ProdutoController {
     @DeleteMapping("/{id}")
     public Optional deletarProduto(@PathVariable Long id) {
         return Optional.ofNullable(produtoService.deletarProduto(id));
+    }
+
+    @PostMapping("/{produtoId}/imagens")
+    public ResponseEntity<String> uploadImagem(@PathVariable Long produtoId, @RequestParam("imagem") MultipartFile file) {
+        String resultado = produtoService.adicionarImagemAoProduto(produtoId, file);
+        return new ResponseEntity<>(resultado, HttpStatus.CREATED);
     }
 }

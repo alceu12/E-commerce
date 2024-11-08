@@ -16,6 +16,6 @@ public class ProdutoDTO {
     private String descricao;
     private double valor;
     private int estoque;
-    private List<String> imagens;
     private CategoriaDTO categoriaDTO;
+    private List<ImagemDTO> imagens;
 }
