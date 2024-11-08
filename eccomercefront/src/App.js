@@ -1,12 +1,16 @@
 import React from 'react';
 import './App.css';
-import Homecliente from './Homecliente';
 import AdminPage from './AdminPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+
 function App() {
   return (
-    <div className="App">
-      <Homecliente />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/admin/*" element={<AdminPage />} />
+      </Routes>
+    </Router>
   );
 }
 
