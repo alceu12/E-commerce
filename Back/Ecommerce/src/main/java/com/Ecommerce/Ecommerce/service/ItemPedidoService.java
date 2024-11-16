@@ -34,10 +34,12 @@ public class ItemPedidoService {
                 throw new RuntimeException("Endereço com ID " + itemPedido.getProduto().getId() + " não encontrado.");
             }
         }
+        assert itemPedido.getProduto() != null;
         if (itemPedido.getQuantidade() > itemPedido.getProduto().getEstoque()
                 || itemPedido.getQuantidade() <= 0) {
             throw new RuntimeException("Quantidade inválida");
         }
+        itemPedido.getProduto().setEstoque(itemPedido.getProduto().getEstoque() - itemPedido.getQuantidade());
         itemPedido.setPrecoUnitario(itemPedido.getProduto().getValor());
         itemPedido = itemPedidoRepository.save(itemPedido);
         return ItemPedidoMapper.toDTO(itemPedido);
