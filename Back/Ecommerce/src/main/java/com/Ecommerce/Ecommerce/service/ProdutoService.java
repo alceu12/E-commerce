@@ -1,16 +1,21 @@
 package com.Ecommerce.Ecommerce.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.Ecommerce.Ecommerce.dto.ImagemDTO;
 import com.Ecommerce.Ecommerce.dto.ProdutoDTO;
 import com.Ecommerce.Ecommerce.entity.Categoria;
+import com.Ecommerce.Ecommerce.entity.Imagem;
 import com.Ecommerce.Ecommerce.entity.Produto;
 import com.Ecommerce.Ecommerce.repository.CategoriaRepository;
 import com.Ecommerce.Ecommerce.repository.ProdutoRepository;
+import com.Ecommerce.Ecommerce.util.ImagemMapper;
 import com.Ecommerce.Ecommerce.util.ProdutoMapper;
 
 @Service
@@ -59,16 +64,27 @@ public class ProdutoService {
         produtoExistente.setDescricao(produtoDTO.getDescricao());
         produtoExistente.setValor(produtoDTO.getValor());
         produtoExistente.setEstoque(produtoDTO.getEstoque());
-        produtoExistente.setImagens(produtoDTO.getImagens());
 
         if (produtoDTO.getCategoriaDTO() != null && produtoDTO.getCategoriaDTO().getId() != null) {
-            Optional<Categoria> categoriaOptional = categoriaRepository.findById(produtoDTO.getCategoriaDTO().getId());
-            categoriaOptional.ifPresent(produtoExistente::setCategoria);
+            Categoria categoria = categoriaRepository.findById(produtoDTO.getCategoriaDTO().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+            produtoExistente.setCategoria(categoria);
+        }
+
+        // Atualiza as imagens apenas se forem fornecidas
+        if (produtoDTO.getImagens() != null && !produtoDTO.getImagens().isEmpty()) {
+            List<Imagem> imagens = produtoDTO.getImagens().stream()
+                    .map(imagemDTO -> ImagemMapper.toEntity(imagemDTO, produtoExistente)) // Passando o produto
+                    .collect(Collectors.toList());
+            produtoExistente.setImagens(imagens);
         }
 
         Produto produtoAtualizado = produtoRepository.save(produtoExistente);
         return ProdutoMapper.toDTO(produtoAtualizado);
     }
+
+
+
 
     public boolean deletarProduto(Long id) {
         Optional<Produto> produtoExistente = produtoRepository.findById(id);
@@ -77,6 +93,25 @@ public class ProdutoService {
             return true;
         } else {
             return false;
+        }
+    }
+    public String adicionarImagemAoProduto(Long produtoId, MultipartFile file) {
+        try {
+            Produto produto = produtoRepository.findById(produtoId)
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+            Imagem imagem = new Imagem();
+            imagem.setDados(file.getBytes());
+            imagem.setProduto(produto);
+
+            produto.getImagens().add(imagem);
+            produtoRepository.save(produto);
+
+            return "Imagem enviada com sucesso";
+        } catch (IOException e) {
+            return "Erro ao processar o arquivo de imagem: " + e.getMessage();
+        } catch (RuntimeException e) {
+            return e.getMessage();
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.Ecommerce.Ecommerce.entity;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -16,6 +17,8 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private double total;
+    private LocalDate dataPedido;
+    private LocalDate dataEntrega;
 
     @Enumerated(EnumType.STRING)
     private StatusPedido statusPedido;
@@ -24,7 +27,11 @@ public class Pedido {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "itemPedido_id", referencedColumnName = "id")
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.PERSIST)
     private List<ItemPedido> itemPedido;
+
+    @ManyToOne
+    @JoinColumn(name = "cupom_id")
+    private Cupom cupomAplicado;
+
 }

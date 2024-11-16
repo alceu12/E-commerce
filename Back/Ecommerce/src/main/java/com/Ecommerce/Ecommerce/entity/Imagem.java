@@ -1,12 +1,14 @@
 package com.Ecommerce.Ecommerce.entity;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,19 +17,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class ItemPedido {
-
+public class Imagem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int quantidade;
-    private double precoUnitario;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "produto_id", referencedColumnName = "id")
-    private Produto produto;
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] dados;
 
     @ManyToOne
-    @JoinColumn(name = "pedido_id")
-    private Pedido pedido;
+    @JoinColumn(name = "produto_id")
+    private Produto produto;
 }

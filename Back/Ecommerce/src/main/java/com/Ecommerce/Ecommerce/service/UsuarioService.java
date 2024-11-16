@@ -99,8 +99,10 @@ public class UsuarioService {
 
     public boolean deletarUsuario(Long id) {
         Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
-        if (usuarioExistente.isPresent()) {
-            usuarioRepository.deleteById(id);
+        if(usuarioExistente.isPresent()){
+            Usuario usuario = usuarioExistente.get();
+            usuario.setStatusUser(StatusUser.DELETED);
+            usuarioRepository.save(usuario);
             return true;
         } else {
             return false;

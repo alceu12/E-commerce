@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import {
     Button,
     Box,
@@ -21,6 +20,8 @@ import {
     deleteProduct,
 } from "./ServiceAdmin/ProdutoService";
 import { getCategories } from "./ServiceAdmin/CategoriaService";
+import { DataGrid } from "@mui/x-data-grid";
+import { useNavigate } from "react-router-dom";
 
 const Produto = () => {
     const [open, setOpen] = useState(false);
@@ -32,6 +33,8 @@ const Produto = () => {
     const [produtos, setProdutos] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [selectedProduto, setSelectedProduto] = useState(null);
+
+    const navigate = useNavigate();
 
     const handleOpen = () => {
         setOpen(true);
@@ -105,6 +108,10 @@ const Produto = () => {
         fetchProdutos();
     }, []);
 
+    const handleRowClick = (params) => {
+        navigate(`/admin/products/${params.row.id}`);
+    };
+
     const columns = [
         { field: "nome", headerName: "Nome", width: 200 },
         { field: "descricao", headerName: "Descrição", width: 200 },
@@ -133,7 +140,7 @@ const Produto = () => {
                         setProdutoEstoque(params.row.estoque);
                         setProdutoCategoria(params.row.categoriaDTO?.id || "");
                         setOpen(true);
-                        fetchCategorias(); // Atualizar as categorias ao editar
+                        fetchCategorias();
                     }}
                 >
                     Editar
@@ -159,6 +166,7 @@ const Produto = () => {
                     columns={columns}
                     pageSize={5}
                     rowsPerPageOptions={[5]}
+                    onRowClick={handleRowClick} // Navega ao clicar na linha
                     style={{ backgroundColor: "#f5f5f5" }}
                 />
             </Box>
@@ -167,7 +175,7 @@ const Produto = () => {
                 open={open}
                 onClose={handleClose}
                 fullWidth
-                maxWidth="md" // Tamanho do popup ajustado para maior largura
+                maxWidth="md"
             >
                 <DialogTitle>
                     {selectedProduto ? "Editar Produto" : "Cadastrar Produto"}
@@ -223,7 +231,6 @@ const Produto = () => {
                             ))}
                         </Select>
                     </FormControl>
-
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="secondary">

@@ -38,3 +38,24 @@ export const deleteProduct = async (id) => {
     throw error;
   }
 };
+export const getProductById = async (id) => {
+  try {
+    const response = await api.get(`/produtos/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao obter produto:', error);
+    throw error;
+  }
+};
+export const uploadProductImage = async (id, formData) => {
+  try {
+    await api.post(`/produtos/${id}/imagens`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  } catch (error) {
+    console.error('Erro ao enviar imagem:', error);
+    throw error;
+  }
+};
