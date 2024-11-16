@@ -167,7 +167,7 @@ const ProdutoDetalhes = () => {
               />
             ) : (
               <Typography variant="h6">
-                Valor: <strong>R$ {produto.valor.toFixed(2)}</strong>
+                Valor: R$ {produto.valor !== undefined && produto.valor !== null ? Number(produto.valor).toFixed(2) : 'N/A'}
               </Typography>
             )}
           </Grid>

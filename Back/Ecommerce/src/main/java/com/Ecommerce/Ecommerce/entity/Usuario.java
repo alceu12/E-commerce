@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Entity
 @Data
@@ -29,5 +32,12 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     private StatusUser statusUser;
-
+    
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_cupons_usados",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "cupom_id")
+    )
+    private Set<Cupom> cuponsUsados = new HashSet<>();
 }

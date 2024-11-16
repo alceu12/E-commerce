@@ -64,18 +64,27 @@ public class ProdutoService {
         produtoExistente.setDescricao(produtoDTO.getDescricao());
         produtoExistente.setValor(produtoDTO.getValor());
         produtoExistente.setEstoque(produtoDTO.getEstoque());
-        produtoExistente.setImagens(produtoDTO.getImagens().stream()
-                .map(ImagemMapper::toEntity)
-                .collect(Collectors.toList()));
 
         if (produtoDTO.getCategoriaDTO() != null && produtoDTO.getCategoriaDTO().getId() != null) {
-            Optional<Categoria> categoriaOptional = categoriaRepository.findById(produtoDTO.getCategoriaDTO().getId());
-            categoriaOptional.ifPresent(produtoExistente::setCategoria);
+            Categoria categoria = categoriaRepository.findById(produtoDTO.getCategoriaDTO().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+            produtoExistente.setCategoria(categoria);
+        }
+
+        // Atualiza as imagens apenas se forem fornecidas
+        if (produtoDTO.getImagens() != null && !produtoDTO.getImagens().isEmpty()) {
+            List<Imagem> imagens = produtoDTO.getImagens().stream()
+                    .map(imagemDTO -> ImagemMapper.toEntity(imagemDTO, produtoExistente)) // Passando o produto
+                    .collect(Collectors.toList());
+            produtoExistente.setImagens(imagens);
         }
 
         Produto produtoAtualizado = produtoRepository.save(produtoExistente);
         return ProdutoMapper.toDTO(produtoAtualizado);
     }
+
+
+
 
     public boolean deletarProduto(Long id) {
         Optional<Produto> produtoExistente = produtoRepository.findById(id);

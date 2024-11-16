@@ -26,6 +26,7 @@ public class ProdutoMapper {
                     .collect(Collectors.toList());
         }
 
+
         return new ProdutoDTO(
                 produto.getId(),
                 produto.getNome(),
@@ -57,10 +58,9 @@ public class ProdutoMapper {
 
         if (dto.getImagens() != null) {
             List<Imagem> imagens = dto.getImagens().stream()
-                    .map(ImagemMapper::toEntity)
+                    .map(imagemDTO -> ImagemMapper.toEntity(imagemDTO, produto)) // Passando o produto
                     .collect(Collectors.toList());
             produto.setImagens(imagens);
-            imagens.forEach(imagem -> imagem.setProduto(produto));
         }
 
         return produto;
