@@ -39,6 +39,28 @@ public class ProdutoController {
         return ResponseEntity.ok(produtos);
     }
 
+    @GetMapping("/filtrar")
+    public List<ProdutoDTO> filtrarProdutos(
+            @RequestParam(required = false) List<String> categorias,
+            @RequestParam(required = false) Double precoMin,
+            @RequestParam(required = false) Double precoMax) {
+        return produtoService.filtrarProdutos(categorias, precoMin, precoMax);
+    }
+
+    @GetMapping("/categoria/{categoriaId}/excluir/{produtoId}")
+    public List<ProdutoDTO> obterProdutosPorCategoria(
+            @PathVariable Long categoriaId,
+            @PathVariable Long produtoId) {
+        return produtoService.obterProdutosPorCategoria(categoriaId, produtoId);
+    }
+
+
+    @GetMapping("/nome/{nome}")
+    public ResponseEntity<List<ProdutoDTO>> obterProdutosPorNome(@PathVariable String nome) {
+        List<ProdutoDTO> produtos = produtoService.obterProdutosPorNome(nome);
+        return ResponseEntity.ok(produtos);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoDTO> obterProdutoPorId(@PathVariable Long id) {
         ProdutoDTO produto = produtoService.obterProdutoPorId(id);

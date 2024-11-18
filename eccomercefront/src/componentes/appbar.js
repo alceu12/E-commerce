@@ -1,24 +1,29 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
+// ResponsiveAppBar.js
+import React, { useState, useContext, useEffect } from 'react';
+import { CarrinhoContext } from '../componentes/Carrinho/CarrinhoContext';
+import { Link } from 'react-router-dom';
+import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Badge, Drawer } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AdbIcon from '@mui/icons-material/Adb';
+import CarrinhoContent from '../componentes/Carrinho/CarrinhoContent';
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['Produtos', 'Categorias', 'Contato'];
+const settings = ['Perfil', 'Conta', 'Sair'];
 
 function ResponsiveAppBar() {
-    const [anchorElNav, setAnchorElNav] = React.useState(null);
-    const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const { carrinho } = useContext(CarrinhoContext);
+    const [anchorElNav, setAnchorElNav] = useState(null);
+    const [anchorElUser, setAnchorElUser] = useState(null);
+    const [isCarrinhoOpen, setIsCarrinhoOpen] = useState(false);
+    const [totalItensCarrinho, setTotalItensCarrinho] = useState(0);
+
+    useEffect(() => {
+        const total = carrinho && carrinho.itens
+            ? carrinho.itens.reduce((sum, item) => sum + item.quantidade, 0)
+            : 0;
+        setTotalItensCarrinho(total);
+    }, [carrinho]);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -34,20 +39,28 @@ function ResponsiveAppBar() {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+
+    const toggleCarrinhoDrawer = (open) => (event) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        setIsCarrinhoOpen(open);
+    };
+
     return (
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <AdbIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>
+                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
 
                     <Typography
                         variant="h6"
                         noWrap
-                        component="a"
-                        href="#app-bar-with-responsive-menu"
+                        component={Link}
+                        to="/"
                         sx={{
                             mr: 2,
-                            display: {xs: 'none', md: 'flex'},
+                            display: { xs: 'none', md: 'flex' },
                             fontFamily: 'monospace',
                             fontWeight: 700,
                             letterSpacing: '.3rem',
@@ -55,19 +68,19 @@ function ResponsiveAppBar() {
                             textDecoration: 'none',
                         }}
                     >
-                        Eccommerce
+                        E-commerce
                     </Typography>
 
-                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
+                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
                             size="large"
-                            aria-label="account of current user"
+                            aria-label="menu mobile"
                             aria-controls="menu-appbar"
                             aria-haspopup="true"
                             onClick={handleOpenNavMenu}
                             color="inherit"
                         >
-                            <MenuIcon/>
+                            <MenuIcon />
                         </IconButton>
                         <Menu
                             id="menu-appbar"
@@ -83,24 +96,24 @@ function ResponsiveAppBar() {
                             }}
                             open={Boolean(anchorElNav)}
                             onClose={handleCloseNavMenu}
-                            sx={{display: {xs: 'block', md: 'none'}}}
+                            sx={{ display: { xs: 'block', md: 'none' } }}
                         >
                             {pages.map((page) => (
                                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography sx={{textAlign: 'center'}}>{page}</Typography>
+                                    <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
                     </Box>
-                    <AdbIcon sx={{display: {xs: 'flex', md: 'none'}, mr: 1}}/>
+                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
                     <Typography
                         variant="h5"
                         noWrap
-                        component="a"
-                        href="#app-bar-with-responsive-menu"
+                        component={Link}
+                        to="/"
                         sx={{
                             mr: 2,
-                            display: {xs: 'flex', md: 'none'},
+                            display: { xs: 'flex', md: 'none' },
                             flexGrow: 1,
                             fontFamily: 'monospace',
                             fontWeight: 700,
@@ -109,27 +122,39 @@ function ResponsiveAppBar() {
                             textDecoration: 'none',
                         }}
                     >
-                        Eccommerce  
+                        E-commerce
                     </Typography>
-                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page) => (
                             <Button
                                 key={page}
                                 onClick={handleCloseNavMenu}
-                                sx={{my: 2, color: 'white', display: 'block'}}
+                                sx={{ my: 2, color: 'white', display: 'block' }}
                             >
                                 {page}
                             </Button>
                         ))}
                     </Box>
-                    <Box sx={{flexGrow: 0}}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
+                    <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}>
+                        {/* Ícone do Carrinho */}
+                        <IconButton
+                            size="large"
+                            aria-label="carrinho de compras"
+                            color="inherit"
+                            onClick={toggleCarrinhoDrawer(true)}
+                        >
+                            <Badge badgeContent={totalItensCarrinho} color="error">
+                                <ShoppingCartIcon />
+                            </Badge>
+                        </IconButton>
+
+                        <Tooltip title="Abrir configurações">
+                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                <Avatar alt="Usuário" src="/static/images/avatar/2.jpg" />
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{mt: '45px'}}
+                            sx={{ mt: '45px' }}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
@@ -146,15 +171,26 @@ function ResponsiveAppBar() {
                         >
                             {settings.map((setting) => (
                                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography sx={{textAlign: 'center'}}>{setting}</Typography>
+                                    <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
                     </Box>
                 </Toolbar>
             </Container>
+            {/* Drawer do Carrinho */}
+            <Drawer anchor="right" open={isCarrinhoOpen} onClose={toggleCarrinhoDrawer(false)}>
+                <Box
+                    sx={{ width: 350 }}
+                    role="presentation"
+                    onKeyDown={toggleCarrinhoDrawer(false)}
+                >
+                    <CarrinhoContent />
+                </Box>
+            </Drawer>
         </AppBar>
     );
+
 }
 
 export default ResponsiveAppBar;
