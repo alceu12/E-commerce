@@ -32,6 +32,12 @@ public class Usuario implements UserDetails{
     private String password;
     private UserRole role;
 
+    public Usuario(String login, String password, UserRole role){
+        this.login = login;
+        this.password = password;
+        this.role = role;
+    }
+
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "endereco_id", referencedColumnName = "id")
