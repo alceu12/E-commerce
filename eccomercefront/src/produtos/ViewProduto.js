@@ -1,4 +1,3 @@
-// ViewProduto.js
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Typography, Box, Button, CardMedia, Grid, Card, CardContent } from '@mui/material';
@@ -16,7 +15,7 @@ const ViewProduto = () => {
     const navigate = useNavigate();
     const [produto, setProduto] = useState(null);
     const [produtosMesmaCategoria, setProdutosMesmaCategoria] = useState([]);
-    const { adicionarItem } = useContext(CarrinhoContext); // Obter a função adicionarItem
+    const { adicionarProduto } = useContext(CarrinhoContext); // Usar função adicionarProduto diretamente
 
     useEffect(() => {
         getProductById(id)
@@ -40,17 +39,8 @@ const ViewProduto = () => {
     }, [id]);
 
     const handleAddToCart = () => {
-        const itemPedido = {
-            quantidade: 1, // Você pode permitir que o usuário selecione a quantidade
-            produto: {
-                id: produto.id,
-                nome: produto.nome,
-                valor: produto.valor,
-            },
-            precoUnitario: produto.valor,
-        };
-
-        adicionarItem(itemPedido);
+        // Usar a função adicionarProduto do contexto
+        adicionarProduto(produto.id, 1); // Produto ID e quantidade fixa (1)
         console.log(`Produto ${produto.id} adicionado ao carrinho.`);
     };
 

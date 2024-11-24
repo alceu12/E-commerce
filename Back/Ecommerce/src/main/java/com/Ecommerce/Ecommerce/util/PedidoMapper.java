@@ -9,6 +9,11 @@ import com.Ecommerce.Ecommerce.entity.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Importando os mappers necessários
+import com.Ecommerce.Ecommerce.util.UsuarioMapper;
+import com.Ecommerce.Ecommerce.util.CupomMapper;
+import com.Ecommerce.Ecommerce.util.ItemPedidoMapper;
+
 public class PedidoMapper {
 
     public static PedidoDTO toDTO(Pedido pedido) {
@@ -21,7 +26,7 @@ public class PedidoMapper {
         dto.setTotal(pedido.getTotal());
         dto.setDataPedido(pedido.getDataPedido());
         dto.setDataEntrega(pedido.getDataEntrega());
-        dto.setStatusPedido(String.valueOf(pedido.getStatusPedido()));
+        dto.setStatusPedido(pedido.getStatusPedido().name());
 
         // Mapear o usuário
         if (pedido.getUsuario() != null) {
@@ -30,11 +35,11 @@ public class PedidoMapper {
         }
 
         // Mapear os itens do pedido
-        if (pedido.getItemPedido() != null) {
-            List<ItemPedidoDTO> itensDTO = pedido.getItemPedido().stream()
-                    .map(ItemPedidoMapper::toDTO)
-                    .collect(Collectors.toList());
+        if (pedido.getItemPedido() != null && !pedido.getItemPedido().isEmpty()) {
+            List<ItemPedidoDTO> itensDTO = ItemPedidoMapper.toListDTO(pedido.getItemPedido());
             dto.setItemPedidoDTO(itensDTO);
+        } else {
+            dto.setItemPedidoDTO(List.of()); // Lista vazia
         }
 
         // Mapear o cupom aplicado
@@ -65,10 +70,8 @@ public class PedidoMapper {
         }
 
         // Mapear os itens do pedido
-        if (dto.getItemPedidoDTO() != null) {
-            List<ItemPedido> itens = dto.getItemPedidoDTO().stream()
-                    .map(ItemPedidoMapper::toEntity)
-                    .collect(Collectors.toList());
+        if (dto.getItemPedidoDTO() != null && !dto.getItemPedidoDTO().isEmpty()) {
+            List<ItemPedido> itens = ItemPedidoMapper.toListEntity(dto.getItemPedidoDTO());
             pedido.setItemPedido(itens);
         }
 

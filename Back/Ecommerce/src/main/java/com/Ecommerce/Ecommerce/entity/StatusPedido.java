@@ -1,4 +1,8 @@
+// src/main/java/com/Ecommerce/Ecommerce/entity/StatusPedido.java
 package com.Ecommerce.Ecommerce.entity;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum StatusPedido {
 
@@ -12,8 +16,13 @@ public enum StatusPedido {
     FAILED("Falhou");
 
     private final String description;
- 
+
     StatusPedido(String description) {
         this.description = description;
+    }
+
+    @JsonValue
+    public String getDescription() {
+        return description;
     }
 }
