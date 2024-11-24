@@ -19,6 +19,7 @@ import { getPedidosByUsuarioId } from './PedidoService';
 import AppBarComponent from '../appbar'; // Certifique-se de que o caminho está correto e case-sensitive
 import FooterComponent from '../Footer'; // Certifique-se de que o caminho está correto e case-sensitive
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { statusMap } from '../utils/statusMap';
 
 const StatusChip = styled(Chip)(({ theme, status }) => ({
     backgroundColor:
@@ -99,8 +100,8 @@ const PedidosUsuarios = () => {
                                 <PedidoListItem onClick={() => handleViewDetails(pedido.id)}>
                                     {/* Status do Pedido */}
                                     <StatusChip
-                                        label={pedido.statusPedido}
-                                        status={pedido.statusPedido}
+                                        label={statusMap[pedido.statusPedido] || pedido.statusPedido}
+                                        status={statusMap[pedido.statusPedido] || pedido.statusPedido}
                                         sx={{
                                             position: 'absolute',
                                             top: 16,
