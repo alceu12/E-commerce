@@ -39,7 +39,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Configurações de CORS
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Origem do seu frontend
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true); // Se precisar permitir credenciais (cookies, autenticação HTTP)
@@ -53,23 +53,47 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .build();
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/produtos/categoria").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categorias").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/produtos/*").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/categorias/*").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/carrinho").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/categorias").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/cupons/*").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/pedidos/*").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/enderecos/*").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/usuarios/*").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/pedidos/*").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/enderecos/*").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/usuarios/*").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/carrinho").permitAll()
+                        .requestMatchers(HttpMethod.DELETE,"/carrinho/*").permitAll()
+                        .requestMatchers(HttpMethod.DELETE,"/carrinho/limpar").permitAll()
+                        .requestMatchers(HttpMethod.DELETE,"/carrinho/remover-produto/*").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/carrinho/*").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/cupons/validar/*").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/pedidos").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/cupons/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/produtos/*").hasRole("ADMIN")
+
+
+                        .anyRequest().permitAll()
+                )
+                .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-    
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

@@ -16,6 +16,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getPedidosByUsuarioId } from './PedidoService';
 import AppBarComponent from '../appbar';
 import FooterComponent from '../Footer';
+import { statusMap } from '../utils/statusMap';
 
 const AddressBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(2),
@@ -122,14 +123,14 @@ const PedidoDetails = () => {
 
                 {/* Informações Básicas */}
                 <Typography variant="subtitle1" gutterBottom>
-                    <strong>Status:</strong> {pedido.statusPedido}
+                    <strong>Status:</strong> {statusMap[pedido.statusPedido] || pedido.statusPedido}
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
                     <strong>Total:</strong> R$ {pedido.total.toFixed(2)}
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
-                    <strong>Previsão de Entrega:</strong>{' '}
-                    {new Date(pedido.previsaoEntrega).toLocaleDateString()} -{' '}
+                    <strong>Data Pedido:</strong>{' '}
+                    {new Date(pedido.dataPedido).toLocaleDateString()}
                 </Typography>
 
                 {/* Endereço de Entrega */}
@@ -152,35 +153,6 @@ const PedidoDetails = () => {
                         </AddressBox>
                     </>
                 )}
-
-                {/* Itens do Pedido */}
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                    Itens do Pedido
-                </Typography>
-                <Grid container spacing={2}>
-                    {pedido.itemPedidoDTO.map((item, index) => (
-                        <Grid item xs={12} key={index}>
-                            <Card sx={{ display: 'flex', alignItems: 'center', mb: 2, boxShadow: 1 }}>
-                                <CardMedia
-                                    component="img"
-                                    sx={{ width: 100, height: 100, objectFit: 'contain', p: 1 }}
-                                    image={item.produtoDTO?.imagem || 'https://via.placeholder.com/100'}
-                                    alt={item.produtoDTO?.nome || 'Produto'}
-                                />
-                                <CardContent sx={{ flexGrow: 1 }}>
-                                    <Typography variant="body1">
-                                        <strong>Produto:</strong> {item.produtoDTO?.nome || 'Produto'}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Quantidade:</strong> {item.quantidade}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-
                 {/* Cupom Aplicado */}
                 {pedido.cupomAplicado && (
                     <>
@@ -193,6 +165,51 @@ const PedidoDetails = () => {
                         </Typography>
                     </>
                 )}
+
+                {/* Itens do Pedido */}
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                    Itens do Pedido
+                </Typography>
+                <Grid container spacing={2}>
+                    {pedido.itemPedidoDTO.map((item) => (
+                        <Grid item xs={12} key={item.id}>
+                            <Card sx={{ display: 'flex', alignItems: 'center', mb: 2, boxShadow: 1 }}>
+                                {item.produtoDTO.imagens && item.produtoDTO.imagens.length > 0 ? (
+                                    <CardMedia
+                                        component="img"
+                                        sx={{ width: 100, height: 100, objectFit: 'contain', p: 1 }}
+                                        image={`data:image/jpeg;base64,${item.produtoDTO.imagens[0].dados}`}
+                                        alt={`Imagem ${item.produtoDTO.imagens[0].id}`}
+                                    />
+                                ) : (
+                                    <CardMedia
+                                        component="img"
+                                        sx={{ width: 100, height: 100, objectFit: 'contain', p: 1 }}
+                                        image={`https://via.placeholder.com/100?text=Sem+Imagem`}
+                                        alt="Sem Imagem"
+                                    />
+                                )}
+                                <CardContent sx={{ flexGrow: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>Produto:</strong> {item.produtoDTO?.nome || 'Produto'}
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        <strong>Descrição:</strong> {item.produtoDTO?.descricao || 'Produto'}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        <strong>Quantidade:</strong> {item.quantidade}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        <strong>Preço Unitário:</strong> R$ {item.precoUnitario.toFixed(2)}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+
+
 
                 {/* Histórico de Status */}
                 {pedido.historicoStatus && pedido.historicoStatus.length > 0 && (
