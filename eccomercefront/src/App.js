@@ -11,6 +11,10 @@ import PedidosUsuario from './componentes/Compra/PedidosUsuario';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import PedidoDetails from './componentes/Compra/PedidoDetails';
+import Login from './componentes/auth/Login';
+import Signup from './componentes/auth/Signup';
+import ForgotPassword from './componentes/auth/ForgotPassword';
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -24,6 +28,11 @@ function App() {
             <Route path="/finalizar-compra" element={<FinalizarCompra />} />
             <Route path="/meus-pedidos" element={<PedidosUsuario />} />
             <Route path="/pedidos/:pedidoId" element={<PedidoDetails />} />
+            <Route path="*" element={<h1>Not Found</h1>} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/cadastro" element={<Signup />} />
+            <Route path="/esqueceu-senha" element={<ForgotPassword />} />
           </Routes>
         </Router>
       </CarrinhoProvider >

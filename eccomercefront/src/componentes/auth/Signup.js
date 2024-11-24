@@ -1,3 +1,5 @@
+// src/componentes/auth/Signup.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,8 +11,18 @@ import {
     validatePassword,
     validateConfirmPassword
 } from '../functions/ValidationFunctions';
-import authService from '../service/AuthService'; // Certifique-se de que o caminho está correto
-import './Signup.css';
+import authService from '../../Service/AuthService';
+import AppBarComponent from '../appbar'; // Ajuste o caminho conforme necessário
+import FooterComponent from '../Footer';   // Ajuste o caminho conforme necessário
+import {
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Paper,
+    Alert,
+    IconButton
+} from '@mui/material';
 
 function Signup() {
     const [formData, setFormData] = useState({
@@ -151,97 +163,142 @@ function Signup() {
     };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <button onClick={handleBack} className="btn btn-link">
-                        <FontAwesomeIcon icon={faArrowLeft} /> Voltar
-                    </button>
-                    <form onSubmit={handleSubmit} className="card card-body">
-                        <h3 className="text-center mb-3">Cadastro</h3>
-                        {error && <div className="alert alert-danger">{error}</div>}
-                        <div className="mb-3">
-                            <label className="form-label">Nome Completo</label>
-                            <input
-                                type="text"
-                                className={`form-control ${validation.fullName === null ? '' : validation.fullName ? 'is-valid' : 'is-invalid'}`}
-                                name="fullName"
-                                value={formData.fullName}
-                                onChange={handleChange}
-                                required
-                            />
-                            {validation.fullName === false && <div className="invalid-feedback">Nome completo necessário.</div>}
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Usuário</label>
-                            <input
-                                type="text"
-                                className={`form-control ${validation.username === null ? '' : validation.username ? 'is-valid' : 'is-invalid'}`}
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                required
-                            />
-                            {validation.username === false && <div className="invalid-feedback">{validation.usernameError}</div>}
-                            {validation.username === true && <div className="valid-feedback">Usuário disponível para cadastro.</div>}
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">E-mail</label>
-                            <input
-                                type="email"
-                                className={`form-control ${validation.email === null ? '' : validation.email ? 'is-valid' : 'is-invalid'}`}
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
-                            {validation.email === false && <div className="invalid-feedback">{validation.emailError}</div>}
-                            {validation.email === true && <div className="valid-feedback">E-mail disponível para cadastro.</div>}
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Senha</label>
-                            <input
-                                type="password"
-                                className={`form-control ${Object.values(validation.password).every(val => val === null) ? '' : Object.values(validation.password).every(Boolean) ? 'is-valid' : 'is-invalid'}`}
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
-                            <div className="password-requirements">
-                                <div className={validation.password.length === null ? '' : validation.password.length ? 'valid' : 'invalid'}>
-                                    <FontAwesomeIcon icon={validation.password.length ? faCheck : faTimes} /> Pelo menos 4 caracteres
-                                </div>
-                                <div className={validation.password.number === null ? '' : validation.password.number ? 'valid' : 'invalid'}>
-                                    <FontAwesomeIcon icon={validation.password.number ? faCheck : faTimes} /> Pelo menos 1 número
-                                </div>
-                                <div className={validation.password.specialChar === null ? '' : validation.password.specialChar ? 'valid' : 'invalid'}>
-                                    <FontAwesomeIcon icon={validation.password.specialChar ? faCheck : faTimes} /> Pelo menos 1 caractere especial
-                                </div>
-                                <div className={validation.password.noWhitespace === null ? '' : validation.password.noWhitespace ? 'valid' : 'invalid'}>
-                                    <FontAwesomeIcon icon={validation.password.noWhitespace ? faCheck : faTimes} /> Sem espaços em branco
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Confirme sua Senha</label>
-                            <input
-                                type="password"
-                                className={`form-control ${validation.confirmPassword === null ? '' : validation.confirmPassword ? 'is-valid' : 'is-invalid'}`}
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                            />
-                            {validation.confirmPassword === false && <div className="invalid-feedback">As senhas não coincidem.</div>}
-                            {validation.confirmPassword === true && <div className="valid-feedback">As senhas coincidem.</div>}
-                        </div>
-                        <button type="submit" className="btn btn-primary w-100">Cadastrar</button>
+        <Box display="flex" flexDirection="column" minHeight="100vh">
+            {/* AppBar no topo */}
+            <AppBarComponent />
+
+            {/* Conteúdo Principal */}
+            <Box
+                component="main"
+                flexGrow={1}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                p={2}
+                bgcolor="#f5f5f5"
+            >
+                <Paper
+                    elevation={6}
+                    sx={{
+                        p: 4,
+                        maxWidth: 500,
+                        width: '100%'
+                    }}
+                >
+                    <Box display="flex" justifyContent="flex-start" mb={2}>
+                        <IconButton onClick={handleBack}>
+                            <FontAwesomeIcon icon={faArrowLeft} />
+                        </IconButton>
+                    </Box>
+                    <Typography variant="h5" component="h1" align="center" gutterBottom>
+                        Cadastro
+                    </Typography>
+                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                    <form onSubmit={handleSubmit}>
+                        <TextField
+                            label="Nome Completo"
+                            variant="outlined"
+                            fullWidth
+                            name="fullName"
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            sx={{ mb: 2 }}
+                            required
+                            error={validation.fullName === false}
+                            helperText={validation.fullName === false ? 'Nome completo necessário.' : ''}
+                        />
+                        <TextField
+                            label="Usuário"
+                            variant="outlined"
+                            fullWidth
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            sx={{ mb: 2 }}
+                            required
+                            error={validation.username === false}
+                            helperText={validation.username === false ? validation.usernameError : validation.username === true ? 'Usuário disponível para cadastro.' : ''}
+                        />
+                        <TextField
+                            label="E-mail"
+                            variant="outlined"
+                            fullWidth
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            sx={{ mb: 2 }}
+                            required
+                            error={validation.email === false}
+                            helperText={validation.email === false ? validation.emailError : validation.email === true ? 'E-mail disponível para cadastro.' : ''}
+                        />
+                        <TextField
+                            label="Senha"
+                            variant="outlined"
+                            fullWidth
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            sx={{ mb: 1 }}
+                            required
+                            error={!Object.values(validation.password).every(val => val === null || val === true)}
+                        />
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="subtitle2">Requisitos da Senha:</Typography>
+                            <Box display="flex" alignItems="center">
+                                <FontAwesomeIcon icon={validation.password.length ? faCheck : faTimes} color={validation.password.length ? 'green' : 'red'} />
+                                <Typography variant="body2" sx={{ ml: 1 }}>
+                                    Pelo menos 4 caracteres
+                                </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center">
+                                <FontAwesomeIcon icon={validation.password.number ? faCheck : faTimes} color={validation.password.number ? 'green' : 'red'} />
+                                <Typography variant="body2" sx={{ ml: 1 }}>
+                                    Pelo menos 1 número
+                                </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center">
+                                <FontAwesomeIcon icon={validation.password.specialChar ? faCheck : faTimes} color={validation.password.specialChar ? 'green' : 'red'} />
+                                <Typography variant="body2" sx={{ ml: 1 }}>
+                                    Pelo menos 1 caractere especial
+                                </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center">
+                                <FontAwesomeIcon icon={validation.password.noWhitespace ? faCheck : faTimes} color={validation.password.noWhitespace ? 'green' : 'red'} />
+                                <Typography variant="body2" sx={{ ml: 1 }}>
+                                    Sem espaços em branco
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <TextField
+                            label="Confirme sua Senha"
+                            variant="outlined"
+                            fullWidth
+                            name="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            sx={{ mb: 2 }}
+                            required
+                            error={validation.confirmPassword === false}
+                            helperText={validation.confirmPassword === false ? 'As senhas não coincidem.' : ''}
+                        />
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                        >
+                            Cadastrar
+                        </Button>
                     </form>
-                </div>
-            </div>
-        </div>
+                </Paper>
+            </Box>
+
+            {/* Footer na parte inferior */}
+            <FooterComponent />
+        </Box>
     );
 }
-
 export default Signup;

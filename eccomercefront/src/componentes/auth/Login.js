@@ -1,10 +1,11 @@
+// src/components/Login/Login.jsx
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import authService from '../service/authService';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './login.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
+import authService from '../../Service/AuthService';
+import AppBarComponent from '../appbar'; // Ajuste o caminho conforme necessário
+import FooterComponent from '../Footer';   // Ajuste o caminho conforme necessário
+import { Box, Typography, TextField, Button, Paper, Alert } from '@mui/material';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -16,63 +17,78 @@ function Login() {
         event.preventDefault();
         try {
             await authService.login(email, password);
-            navigate('/home');
+            navigate('/');
         } catch (error) {
             console.error('Login failed', error);
-            setError('Invalid email or password');
+            setError('E-mail ou senha inválidos');
         }
     };
 
     return (
-        <div className="container">
-            <div className="row justify-content-center align-items-center">
-                <div className="col-6 col-md-4">
-                    <form onSubmit={handleLogin} className="card card-body">
-                        <div className="text-center mb-4">
-                            <img src={Logo} alt="Instagram" className="mb-3" />
-                        </div>
-                        {error && <div className="alert alert-danger">{error}</div>}
-                        <div className="col-auto mb-3">
-                            <label className="visually-hidden" htmlFor="autoSizingInputGroup">Email</label>
-                            <div className="input-group">
-                                <div className="input-group-text">@</div>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="autoSizingInputGroup"
-                                    placeholder="Usuário"
-                                    value={username}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="mb-3">
-                            <div className="input-group">
-                                <span className="input-group-text">
-                                    <FontAwesomeIcon icon={faLock} />
-                                </span>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    placeholder="Coloque sua senha aqui"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <button type="submit" className="btn btn-primary w-100">Log In</button>
-                        <p className="text-center mt-2">
-                            Esqueceu a senha? <Link to="/forgot-password">Clique aqui</Link>
-                        </p>
-                        <p className="text-center mt-2">
-                            Não possui conta? <a href="/signup">Cadastre-se</a>
-                        </p>
+        <Box display="flex" flexDirection="column" minHeight="100vh">
+            {/* AppBar no topo */}
+            <AppBarComponent />
+
+            {/* Conteúdo Principal */}
+            <Box
+                component="main"
+                flexGrow={1}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                p={2}
+                bgcolor="#f5f5f5"
+            >
+                <Paper elevation={6} sx={{ p: 4, maxWidth: 400, width: '100%' }}>
+                    <Typography variant="h5" component="h1" align="center" gutterBottom>
+                        Login
+                    </Typography>
+                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                    <form onSubmit={handleLogin}>
+                        <TextField
+                            label="E-mail"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            required
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <TextField
+                            label="Senha"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            required
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            sx={{ mt: 2 }}
+                        >
+                            Entrar
+                        </Button>
                     </form>
-                </div>
-            </div>
-        </div>
+                    <Box mt={2} textAlign="center">
+                        <Typography variant="body2">
+                            Esqueceu a senha? <Link to="/esqueceu-senha">Clique aqui</Link>
+                        </Typography>
+                        <Typography variant="body2">
+                            Não possui conta? <Link to="/cadastro">Cadastre-se</Link>
+                        </Typography>
+                    </Box>
+                </Paper>
+            </Box>
+
+            {/* Footer na parte inferior */}
+            <FooterComponent />
+        </Box>
     );
 }
 
