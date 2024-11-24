@@ -2,11 +2,11 @@ package com.Ecommerce.Ecommerce.controller;
 
 import java.util.Optional;
 
+import com.Ecommerce.Ecommerce.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.token.TokenService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +40,7 @@ public class AuthenticationController {
     //private AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+
     private final TokenService tokenService;
 
     @Autowired
@@ -75,7 +76,7 @@ public class AuthenticationController {
     @SuppressWarnings("rawtypes")
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody AuthenticationDTO body) {
-        Usuario usuario = this.usuarioRepository.findByUsername(body.username())
+        Usuario usuario = this.usuarioRepository.findByEmail(body.email())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         if (passwordEncoder.matches(body.password(), usuario.getPassword())) {
             String token = this.tokenService.generateToken(usuario);
@@ -106,7 +107,7 @@ public class AuthenticationController {
 
     @PutMapping("/change-password")
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-        Usuario usuario = usuarioRepository.findByUsername(changePasswordDTO.getUsername())
+        Usuario usuario = usuarioRepository.findByEmail(changePasswordDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), usuario.getPassword())) {
@@ -125,7 +126,7 @@ public class AuthenticationController {
 
     @PutMapping("/change-email")
     public ResponseEntity<Void> changeEmail(@RequestBody ChangeEmailDTO changeEmailDTO) {
-        Usuario usuario = usuarioRepository.findByUsername(changeEmailDTO.getUsername())
+        Usuario usuario = usuarioRepository.findByEmail(changeEmailDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         usuario.setEmail(changeEmailDTO.getEmail());

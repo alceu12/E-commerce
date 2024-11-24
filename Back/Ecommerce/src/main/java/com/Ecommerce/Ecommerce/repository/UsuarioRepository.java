@@ -7,16 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.Ecommerce.Ecommerce.entity.Usuario;
+import org.springframework.stereotype.Repository;
 
-public interface UsuarioRepository extends JpaRepository <Usuario, Long> {
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    Optional<Usuario> findByLogin(String login);
 
-    UserDetails findByLogin(String username);
-    
+    // Método para buscar por email
     Optional<Usuario> findByEmail(String email);
 
-    Optional<Usuario> findByUsername(String username);
-
-    List<Usuario> findByUsernameStartingWithIgnoreCase(String username);
-
+    // Método para verificar existência por email
     boolean existsByEmail(String email);
 }
