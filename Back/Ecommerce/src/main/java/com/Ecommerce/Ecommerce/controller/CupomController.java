@@ -39,9 +39,20 @@ public class CupomController {
         cupomService.deletarCupom(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping
     public ResponseEntity<?> listarCupons() {
         return ResponseEntity.ok(cupomService.listarCupons());
     }
 
+    @GetMapping("/validar/{codigo}")
+    public ResponseEntity<?> validarCupom(@PathVariable String codigo) {
+        return ResponseEntity.ok(cupomService.validarCupom(codigo));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deletarTodosCupons() {
+        cupomService.deletarTodosCupons();
+        return ResponseEntity.noContent().build();
+    }
 }

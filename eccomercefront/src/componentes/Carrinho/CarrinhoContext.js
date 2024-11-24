@@ -1,41 +1,57 @@
-// CarrinhoContext.js
 import React, { createContext, useState, useEffect } from 'react';
-import { getCarrinhoFromAPI, adicionarItemNaAPI, removerItemDaAPI, limparCarrinhoNaAPI } from './CarrinhoService';
+import { getCarrinhoFromAPI, adicionarProdutoNaAPI, removerProdutoDaAPI, limparCarrinhoNaAPI } from './CarrinhoService';
 
 export const CarrinhoContext = createContext();
 
 export const CarrinhoProvider = ({ children }) => {
     const [carrinho, setCarrinho] = useState(null);
 
-    const usuarioId = 1; // Substitua pelo ID real do usuário
-
     useEffect(() => {
-        // Obter o carrinho do backend quando o componente for montado
-        getCarrinhoFromAPI(usuarioId).then((data) => {
+        getCarrinhoFromAPI().then((data) => {
             setCarrinho(data);
+        }).catch((error) => {
+            console.error('Erro ao obter carrinho:', error);
         });
     }, []);
 
-    const adicionarItem = (itemPedido) => {
-        adicionarItemNaAPI(usuarioId, itemPedido).then((data) => {
+    const adicionarProduto = (produtoId, quantidade) => {
+        adicionarProdutoNaAPI(produtoId, quantidade).then((data) => {
             setCarrinho(data);
+        }).catch((error) => {
+            console.error('Erro ao adicionar produto ao carrinho:', error);
         });
     };
 
-    const removerItem = (itemId) => {
-        removerItemDaAPI(usuarioId, itemId).then((data) => {
+    const removerProduto = (produtoId) => {
+        removerProdutoDaAPI(produtoId).then((data) => {
             setCarrinho(data);
+        }).catch((error) => {
+            console.error('Erro ao remover produto do carrinho:', error);
         });
     };
 
     const limparCarrinho = () => {
-        limparCarrinhoNaAPI(usuarioId).then(() => {
-            setCarrinho(null);
+        limparCarrinhoNaAPI().then((data) => {
+            setCarrinho(data);
+        }).catch((error) => {
+            console.error('Erro ao limpar carrinho:', error);
         });
     };
 
+    const alterarQuantidade = (produtoId, novaQuantidade) => {
+        if (novaQuantidade <= 0) return;
+
+        adicionarProdutoNaAPI(produtoId, novaQuantidade - carrinho.itens.find(item => item.produtoDTO.id === produtoId).quantidade)
+            .then((data) => {
+                setCarrinho(data);
+            })
+            .catch((error) => {
+                console.error('Erro ao alterar quantidade:', error);
+            });
+    };
+
     return (
-        <CarrinhoContext.Provider value={{ carrinho, adicionarItem, removerItem, limparCarrinho }}>
+        <CarrinhoContext.Provider value={{ carrinho, adicionarProduto, removerProduto, limparCarrinho, alterarQuantidade }}>
             {children}
         </CarrinhoContext.Provider>
     );

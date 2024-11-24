@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.Ecommerce.Ecommerce.dto.ItemPedidoDTO;
 import com.Ecommerce.Ecommerce.entity.*;
 import com.Ecommerce.Ecommerce.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,11 +65,6 @@ public class PedidoService {
                     .orElseThrow(() -> new RuntimeException("Cupom não encontrado."));
 
             // Validar data do cupom
-            LocalDate dataAtual = LocalDate.now();
-            if (dataAtual.isBefore(cupom.getDataInicio()) || dataAtual.isAfter(cupom.getDataFim())) {
-                throw new RuntimeException("Cupom fora do prazo de validade.");
-            }
-
             // Aplicar desconto se o valor mínimo for atingido
             if (cupom.getValorMinimo() <= total) {
                 double desconto = total * cupom.getValorDesconto();
@@ -121,7 +117,7 @@ public class PedidoService {
 
     public boolean deletarPedido(Long id) {
         Optional<Pedido> pedidoExistente = pedidoRepository.findById(id);
-        if(pedidoExistente.isPresent()){
+        if (pedidoExistente.isPresent()) {
             pedidoRepository.deleteById(id);
             return true;
         } else {
@@ -129,4 +125,19 @@ public class PedidoService {
         }
     }
 
+    public PedidoDTO atualizarStatusPedido(Long id, StatusPedido statusPedido) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
+
+        pedido.setStatusPedido(statusPedido);
+        Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+
+        return PedidoMapper.toDTO(pedidoAtualizado);
+    }
+
+    public List<PedidoDTO> obterPedidosPorUsuario(Long usuarioId) {
+        return pedidoRepository.findAllByUsuarioIdOrderByDataPedidoDesc(usuarioId).stream()
+                .map(PedidoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

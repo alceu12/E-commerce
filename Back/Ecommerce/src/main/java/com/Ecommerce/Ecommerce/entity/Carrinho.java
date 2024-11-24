@@ -1,59 +1,28 @@
 package com.Ecommerce.Ecommerce.entity;
 
+import jakarta.persistence.*;
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.Ecommerce.Ecommerce.entity.ItemPedido;
-
+@Data
+@Entity
 public class Carrinho {
 
-    private Long usuarioId;
-    private List<ItemPedido> itens;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public Carrinho(Long usuarioId) {
-        this.usuarioId = usuarioId;
-        this.itens = new ArrayList<>();
-    }
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "carrinho_id")
+    private List<ItemPedido> itens = new ArrayList<>();
 
-    // Getters e Setters
+    private Double total = 0.0;
 
-    public Long getUsuarioId() {
-        return usuarioId;
-    }
-
-    public List<ItemPedido> getItens() {
-        return itens;
-    }
-
-    public void setItens(List<ItemPedido> itens) {
-        this.itens = itens;
-    }
-
-    // Métodos para adicionar e remover itens
-
-    public void adicionarItem(ItemPedido item) {
-        // Verificar se o produto já está no carrinho
-        boolean itemExistente = false;
-        for (ItemPedido i : itens) {
-            if (i.getProduto().getId().equals(item.getProduto().getId())) {
-                // Atualizar a quantidade do item existente
-                i.setQuantidade(i.getQuantidade() + item.getQuantidade());
-                itemExistente = true;
-                break;
-            }
-        }
-        if (!itemExistente) {
-            // Adicionar novo item ao carrinho
-            itens.add(item);
-        }
-    }
-
-    public void removerItem(Long produtoId) {
-        itens.removeIf(item -> item.getProduto().getId().equals(produtoId));
-    }
-
-
-    public void limparCarrinho() {
-        this.itens.clear();
+    public void atualizarTotal() {
+        this.total = itens.stream()
+                .mapToDouble(item -> item.getPrecoUnitario() * item.getQuantidade())
+                .sum();
     }
 }

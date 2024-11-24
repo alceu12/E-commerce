@@ -1,10 +1,9 @@
 package com.Ecommerce.Ecommerce.controller;
 
-import com.Ecommerce.Ecommerce.entity.Carrinho;
-import com.Ecommerce.Ecommerce.entity.ItemPedido;
+import com.Ecommerce.Ecommerce.dto.CarrinhoDTO;
 import com.Ecommerce.Ecommerce.service.CarrinhoService;
-import com.Ecommerce.Ecommerce.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,32 +13,34 @@ public class CarrinhoController {
     @Autowired
     private CarrinhoService carrinhoService;
 
-    @Autowired
-    private ProdutoService produtoService;
-
-    // Obter o carrinho do usuário
-    @GetMapping("/{usuarioId}")
-    public Carrinho getCarrinho(@PathVariable Long usuarioId) {
-        return carrinhoService.getCarrinho(usuarioId);
+    @PostMapping("/adicionar-produto")
+    public ResponseEntity<CarrinhoDTO> adicionarProduto(
+            @RequestParam Long produtoId,
+            @RequestParam int quantidade) {
+        return ResponseEntity.ok(carrinhoService.adicionarProduto(produtoId, quantidade));
     }
 
-    // Adicionar um item ao carrinho
-    @PostMapping("/{usuarioId}/adicionar")
-    public Carrinho adicionarItem(@PathVariable Long usuarioId, @RequestBody ItemPedido itemPedido) {
-        // Opcional: Validar se o produto existe e ajustar o preço unitário
-        return carrinhoService.adicionarItem(usuarioId, itemPedido);
+    @DeleteMapping("/remover-produto/{produtoId}")
+    public ResponseEntity<CarrinhoDTO> removerProduto(@PathVariable Long produtoId) {
+        return ResponseEntity.ok(carrinhoService.removerProduto(produtoId));
     }
 
-    // Remover um item do carrinho
-    @DeleteMapping("/{usuarioId}/remover/{produtoId}")
-    public Carrinho removerItem(@PathVariable Long usuarioId, @PathVariable Long produtoId) {
-        return carrinhoService.removerItem(usuarioId, produtoId);
+    @DeleteMapping("/limpar")
+    public ResponseEntity<CarrinhoDTO> limparCarrinho() {
+        return ResponseEntity.ok(carrinhoService.limparCarrinho());
     }
 
-
-    // Limpar o carrinho
-    @DeleteMapping("/{usuarioId}/limpar")
-    public void limparCarrinho(@PathVariable Long usuarioId) {
-        carrinhoService.limparCarrinho(usuarioId);
+    @GetMapping
+    public ResponseEntity<CarrinhoDTO> obterCarrinho() {
+        return ResponseEntity.ok(carrinhoService.obterCarrinho());
     }
+
+    @PostMapping("/{carrinhoId}/alterar-quantidade")
+    public ResponseEntity<CarrinhoDTO> alterarQuantidade(
+            @PathVariable Long carrinhoId,
+            @RequestParam Long produtoId,
+            @RequestParam int quantidade) {
+        return ResponseEntity.ok(carrinhoService.alterarQuantidade(carrinhoId, produtoId, quantidade));
+    }
+
 }

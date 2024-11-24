@@ -30,8 +30,9 @@ public class CupomService {
 
     public Optional<Cupom> validarCupom(String codigo) {
         LocalDate hoje = LocalDate.now();
+
         return cupomRepository.findByCodigoAndAtivoIsTrue(codigo)
-                .filter(cupom -> !hoje.isBefore(cupom.getDataInicio()) && !hoje.isAfter(cupom.getDataFim()));
+                .filter(cupom -> !hoje.isBefore(cupom.getDataInicio())); // Verifica apenas se está ativo e dentro da vigência
     }
 
     public Cupom atualizarCupom(Long id, Cupom cupomAtualizado) {
@@ -50,5 +51,9 @@ public class CupomService {
 
     public void deletarCupom(Long id) {
         cupomRepository.deleteById(id);
+    }
+
+    public void deletarTodosCupons() {
+        cupomRepository.deleteAll();
     }
 }

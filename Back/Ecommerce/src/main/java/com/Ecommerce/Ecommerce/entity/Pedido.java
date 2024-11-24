@@ -27,7 +27,7 @@ public class Pedido {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ItemPedido> itemPedido;
 
     @ManyToOne
