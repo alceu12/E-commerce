@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.Ecommerce.Ecommerce.entity.StatusUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
@@ -31,6 +32,8 @@ public class UsuarioService {
     @Autowired
     private FuncaoRepository funcaoRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public ResponseEntity<UsuarioDTO> criarUsuario(UsuarioDTO usuarioDTO) {
         // Validar o email
@@ -107,5 +110,16 @@ public class UsuarioService {
         } else {
             return false;
         }
+    }
+
+    public boolean existsByEmail(String email) {
+        return usuarioRepository.existsByEmail(email);
+    }
+
+    public void updatePassword(String email, String newPassword) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        usuario.setPassword(passwordEncoder.encode(newPassword));
+        usuarioRepository.save(usuario);
     }
 }
