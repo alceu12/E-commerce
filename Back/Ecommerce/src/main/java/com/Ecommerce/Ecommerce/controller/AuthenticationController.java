@@ -96,7 +96,7 @@ public class AuthenticationController {
             newUser.setEmail(body.email());
             newUser.setNome(body.nome());
             newUser.setLogin(body.login());
-            newUser.setRole(null);
+            newUser.setRole(body.role());
             this.usuarioRepository.save(newUser);
 
             String token = this.tokenService.generateToken(newUser);

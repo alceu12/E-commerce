@@ -58,3 +58,12 @@ export const atualizarStatusPedido = async (pedidoId, novoStatusDescricao) => {
         throw error;
     }
 };
+
+export const updateAddressById = async (id, addressData) => {
+    try {
+        const response = await api.put(`/usuarios/${id}/endereco`, addressData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

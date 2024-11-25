@@ -1,10 +1,10 @@
-// src/components/Login/Login.jsx
+// src/componentes/auth/Login.jsx
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../Service/AuthService';
-import AppBarComponent from '../appbar'; // Ajuste o caminho conforme necessário
-import FooterComponent from '../Footer';   // Ajuste o caminho conforme necessário
+import AppBarComponent from '../appbar';
+import FooterComponent from '../Footer';
 import { Box, Typography, TextField, Button, Paper, Alert } from '@mui/material';
 
 function Login() {
@@ -16,7 +16,9 @@ function Login() {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-            await authService.login(email, password);
+            const response = await authService.login(email, password);
+            // Supondo que 'response.data' contém os dados do usuário
+            localStorage.setItem('user', JSON.stringify(response.data));
             navigate('/');
         } catch (error) {
             console.error('Login failed', error);
@@ -26,10 +28,8 @@ function Login() {
 
     return (
         <Box display="flex" flexDirection="column" minHeight="100vh">
-            {/* AppBar no topo */}
             <AppBarComponent />
 
-            {/* Conteúdo Principal */}
             <Box
                 component="main"
                 flexGrow={1}
@@ -86,7 +86,6 @@ function Login() {
                 </Paper>
             </Box>
 
-            {/* Footer na parte inferior */}
             <FooterComponent />
         </Box>
     );
