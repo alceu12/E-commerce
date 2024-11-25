@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { atualizarStatusPedido } from './PedidoService'; // Ajuste o caminho conforme necessário
 import { useNavigate } from 'react-router-dom';
+import { statusMap } from '../utils/statusMap';
 
 const Pagamento = ({ pedido, voltarEtapa }) => {
     const [formaPagamento, setFormaPagamento] = useState('');
@@ -39,7 +40,7 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
                 .then(() => {
                     setLoading(false);
                     // Navegar para a página de pedidos após atualização bem-sucedida
-                    navigate('/meus-pedidos');
+                    navigate('/pedidos');
                 })
                 .catch(() => {
                     setLoading(false);
@@ -60,7 +61,7 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
                 Total: R$ {pedido.total.toFixed(2)}
             </Typography>
             <Typography variant="body1">
-                Status: {pedido.statusPedido}
+                Status: {statusMap[pedido.statusPedido]}
             </Typography>
 
             <Box sx={{ mt: 3 }}>

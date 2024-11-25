@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.Ecommerce.Ecommerce.dto.EnderecoDTO;
 import com.Ecommerce.Ecommerce.entity.StatusUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -102,7 +103,7 @@ public class UsuarioService {
 
     public boolean deletarUsuario(Long id) {
         Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
-        if(usuarioExistente.isPresent()){
+        if (usuarioExistente.isPresent()) {
             Usuario usuario = usuarioExistente.get();
             usuario.setStatusUser(StatusUser.DELETED);
             usuarioRepository.save(usuario);
@@ -122,4 +123,38 @@ public class UsuarioService {
         usuario.setPassword(passwordEncoder.encode(newPassword));
         usuarioRepository.save(usuario);
     }
+
+    public String atualizarEndereco(Long userId, EnderecoDTO enderecoDTO) throws Exception {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(userId);
+        if (!usuarioOpt.isPresent()) {
+            throw new Exception("Usuário não encontrado.");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        Endereco endereco = usuario.getEndereco();
+
+        if (endereco == null) {
+            // Criar novo endereço
+            endereco = new Endereco();
+        }
+
+        // Atualizar os campos do endereço
+        endereco.setCep(enderecoDTO.getCep());
+        endereco.setRua(enderecoDTO.getRua());
+        endereco.setNumero(enderecoDTO.getNumero());
+        endereco.setComplemento(enderecoDTO.getComplemento());
+
+        // Associar o endereço ao usuário
+        usuario.setEndereco(endereco);
+        usuario.setStatusUser(StatusUser.ACTIVE);
+        // Salvar o usuário (cascade salvará o endereço)
+        usuarioRepository.save(usuario);
+
+        return "Endereço atualizado com sucesso.";
+    }
+
+    public boolean verifyIfUserExists(String login) {
+        return usuarioRepository.existsByLogin(login);
+    }
+
 }

@@ -30,6 +30,7 @@ public class Usuario implements UserDetails{
     private String login;
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     public Usuario(String login, String password, UserRole role){

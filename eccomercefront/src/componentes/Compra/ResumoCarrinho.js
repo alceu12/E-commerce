@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { CarrinhoContext } from '../Carrinho/CarrinhoContext';
 import { validarCupom, finalizarPedido } from './PedidoService';
+import { jwtDecode } from 'jwt-decode';
 
 const ResumoCarrinho = ({ avancarEtapa }) => {
     const { carrinho } = useContext(CarrinhoContext);
@@ -24,6 +25,9 @@ const ResumoCarrinho = ({ avancarEtapa }) => {
     const [loading, setLoading] = useState(false);
     const [cupomId, setCupomId] = useState(null); // Armazenar o ID do cupom aplicado
 
+    const storedToken = localStorage.getItem('userToken');
+    const decodedToken = jwtDecode(storedToken);
+    const userId = decodedToken.id;
     const handleValidarCupom = () => {
         validarCupom(cupom)
             .then((data) => {
@@ -49,7 +53,7 @@ const ResumoCarrinho = ({ avancarEtapa }) => {
 
         const pedidoDTO = {
             usuarioDTO: {
-                id: 7, // ID fixo do usuário
+                id: userId,
             },
             itemPedidoDTO: carrinho.itens.map((item) => ({
                 id: item.id, // Supondo que cada item tenha um ID

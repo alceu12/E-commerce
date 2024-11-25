@@ -26,7 +26,8 @@ public class UsuarioMapper {
                 usuario.getPassword(),
                 enderecoDTO,
                 funcaoDTO,
-                usuario.getStatusUser().name()
+                // se o status for nullo defina como ativo
+                usuario.getStatusUser() == null ? StatusUser.ACTIVE.name() : usuario.getStatusUser().name()
 
         );
     }

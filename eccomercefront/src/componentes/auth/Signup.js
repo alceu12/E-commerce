@@ -1,11 +1,11 @@
-// src/componentes/auth/Signup.jsx
+// src/componentes/auth/Signup.jsx 
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import {
-    validateFullName,
+    validateFullName, // Assumindo que esta função valida o nome completo
     checkUsernameAvailability,
     checkEmailAvailability,
     validatePassword,
@@ -26,16 +26,16 @@ import {
 
 function Signup() {
     const [formData, setFormData] = useState({
-        username: '',
+        nome: '',
+        login: '',
         email: '',
         password: '',
         confirmPassword: '',
-        fullName: ''
     });
     const [validation, setValidation] = useState({
-        fullName: null,
-        username: null,
-        usernameError: '',
+        nome: null,
+        login: null,
+        loginError: '',
         email: null,
         emailError: '',
         password: {
@@ -50,38 +50,38 @@ function Signup() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (formData.fullName) {
+        if (formData.nome) {
             setValidation((prevValidation) => ({
                 ...prevValidation,
-                fullName: validateFullName(formData.fullName)
+                nome: validateFullName(formData.nome)
             }));
         } else {
             setValidation((prevValidation) => ({
                 ...prevValidation,
-                fullName: null
+                nome: null
             }));
         }
-    }, [formData.fullName]);
+    }, [formData.nome]);
 
     useEffect(() => {
-        const checkUsername = async () => {
-            const result = await checkUsernameAvailability(formData.username);
+        const checkLogin = async () => {
+            const result = await checkUsernameAvailability(formData.login);
             setValidation((prevValidation) => ({
                 ...prevValidation,
-                username: result.isValid,
-                usernameError: result.message
+                login: result.isValid,
+                loginError: result.message
             }));
         };
-        if (formData.username) {
-            checkUsername();
+        if (formData.login) {
+            checkLogin();
         } else {
             setValidation((prevValidation) => ({
                 ...prevValidation,
-                username: null,
-                usernameError: ''
+                login: null,
+                loginError: ''
             }));
         }
-    }, [formData.username]);
+    }, [formData.login]);
 
     useEffect(() => {
         const checkEmail = async () => {
@@ -142,14 +142,17 @@ function Signup() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!validation.fullName || !validation.username || !validation.email || !validation.confirmPassword ||
-            !Object.values(validation.password).every(Boolean)) {
+        // Verificar se todas as validações estão passando
+        if (!validation.nome || !validation.login || !validation.email || !validation.confirmPassword ||
+            !Object.values(validation.password).every(val => val === null || val === true)) {
             setError('Por favor, preencha o formulário corretamente.');
             return;
         }
         try {
             const { confirmPassword, ...dataToSend } = formData;
-            const response = await authService.signup(dataToSend);
+            // Adicionar role: "USER"
+            const dataWithRole = { ...dataToSend, role: "USER" };
+            const response = await authService.signup(dataWithRole);
             console.log('Cadastro bem-sucedido', response);
             navigate('/login');
         } catch (error) {
@@ -199,25 +202,31 @@ function Signup() {
                             label="Nome Completo"
                             variant="outlined"
                             fullWidth
-                            name="fullName"
-                            value={formData.fullName}
+                            name="nome"
+                            value={formData.nome}
                             onChange={handleChange}
                             sx={{ mb: 2 }}
                             required
-                            error={validation.fullName === false}
-                            helperText={validation.fullName === false ? 'Nome completo necessário.' : ''}
+                            error={validation.nome === false}
+                            helperText={validation.nome === false ? 'Nome completo necessário.' : ''}
                         />
                         <TextField
                             label="Usuário"
                             variant="outlined"
                             fullWidth
-                            name="username"
-                            value={formData.username}
+                            name="login"
+                            value={formData.login}
                             onChange={handleChange}
                             sx={{ mb: 2 }}
                             required
-                            error={validation.username === false}
-                            helperText={validation.username === false ? validation.usernameError : validation.username === true ? 'Usuário disponível para cadastro.' : ''}
+                            error={validation.login === false}
+                            helperText={
+                                validation.login === false
+                                    ? validation.loginError
+                                    : validation.login === true
+                                        ? 'Usuário disponível para cadastro.'
+                                        : ''
+                            }
                         />
                         <TextField
                             label="E-mail"
@@ -229,7 +238,13 @@ function Signup() {
                             sx={{ mb: 2 }}
                             required
                             error={validation.email === false}
-                            helperText={validation.email === false ? validation.emailError : validation.email === true ? 'E-mail disponível para cadastro.' : ''}
+                            helperText={
+                                validation.email === false
+                                    ? validation.emailError
+                                    : validation.email === true
+                                        ? 'E-mail disponível para cadastro.'
+                                        : ''
+                            }
                         />
                         <TextField
                             label="Senha"
@@ -241,7 +256,9 @@ function Signup() {
                             onChange={handleChange}
                             sx={{ mb: 1 }}
                             required
-                            error={!Object.values(validation.password).every(val => val === null || val === true)}
+                            error={
+                                !Object.values(validation.password).every(val => val === null || val === true)
+                            }
                         />
                         <Box sx={{ mb: 2 }}>
                             <Typography variant="subtitle2">Requisitos da Senha:</Typography>
