@@ -9,7 +9,7 @@ export const checkUsernameAvailability = async (username) => {
         return { isValid: false, message: 'Usuário deve ter pelo menos 4 caracteres e não pode ter caracteres especiais.' };
     }
     try {
-        const response = await axios.get(`http://localhost:8080/usuarios/${username}/verify`);
+        const response = await axios.get(`https://e-commerce-07vh.onrender.com/usuarios/${username}/verify`);
         return { isValid: !response.data, message: response.data ? 'Usuário já cadastrado.' : '' };
     } catch (error) {
         console.error('Erro ao verificar disponibilidade do usuário', error);
