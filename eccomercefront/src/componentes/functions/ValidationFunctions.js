@@ -23,7 +23,7 @@ export const checkEmailAvailability = async (email) => {
         return { isValid: false, message: 'E-mail inválido.' };
     }
     try {
-        const response = await axios.get(`http://localhost:8080/usuarios/check-email?email=${email}`);
+        const response = await axios.get(`https://e-commerce-07vh.onrender.com/usuarios/check-email?email=${email}`);
         return { isValid: !response.data, message: response.data ? 'E-mail já cadastrado.' : '' };
     } catch (error) {
         console.error('Erro ao verificar disponibilidade do email', error);
