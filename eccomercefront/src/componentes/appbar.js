@@ -37,30 +37,30 @@ function ResponsiveAppBar() {
         // Verifica se o usuário está logado ao montar o componente
         const storedToken = localStorage.getItem('userToken');
         if (storedToken) {
-            try {
-                const decodedToken = jwtDecode(storedToken);
-                // Verifica se o token não expirou
-                const currentTime = Date.now() / 1000;
-                if (decodedToken.exp < currentTime) {
-                    // Token expirado
-                    handleLogout();
-                } else {
-                    setIsLoggedIn(true);
-                    setUser({
-                        id: decodedToken.id,
-                        email: decodedToken.email,
-                        // Adicione outros campos conforme necessário
-                    });
-                }
-            } catch (error) {
-                console.error('Erro ao decodificar o token:', error);
-                handleLogout();
+          try {
+            const decodedToken = jwtDecode(storedToken);
+            // Verifica se o token não expirou
+            const currentTime = Date.now() / 1000;
+            if (decodedToken.exp < currentTime) {
+              // Token expirado
+              handleLogout();
+            } else {
+              setIsLoggedIn(true);
+              setUser({
+                id: decodedToken.id,
+                email: decodedToken.email,
+                // Adicione outros campos conforme necessário
+              });
             }
+          } catch (error) {
+            console.error('Erro ao decodificar o token:', error);
+            handleLogout();
+          }
         } else {
-            setIsLoggedIn(false);
-            setUser(null);
+          setIsLoggedIn(false);
+          setUser(null);
         }
-    }, []);
+      }, [handleLogout]);
 
     useEffect(() => {
         const total = carrinho && carrinho.itens
