@@ -3,10 +3,10 @@ name: CI/CD Workflow
 on:
   push:
     branches:
-      - dev  # Executa o workflow em pushs para a branch 'main'
+      - main  # Executa o workflow em pushs para a branch 'main'
   pull_request:
     branches:
-      - dev  # Executa o workflow em pull requests para a branch 'main'
+      - main  # Executa o workflow em pull requests para a branch 'main'
 
 jobs:
   build-and-test:
@@ -48,7 +48,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-
+     depends-on: build-and-test  # Define que o job depende do job 'build-and-test'
     steps:
       # 9. Deploy do backend no Render
       - name: Deploy Backend
