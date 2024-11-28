@@ -91,14 +91,7 @@ function ResponsiveAppBar() {
         setIsCarrinhoOpen(open);
     };
 
-    const handleLogout = () => {
-        // Limpa o localStorage e atualiza o estado de autenticação
-        localStorage.removeItem('userToken');
-        setIsLoggedIn(false);
-        setUser(null);
-        handleCloseUserMenu();
-        navigate('/login');
-    };
+
 
     // Definir as opções de menu com base no estado de autenticação
     const settings = isLoggedIn
