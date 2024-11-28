@@ -155,7 +155,7 @@ const PedidoDetails = () => {
         );
     }
 
-    const { enderecoDTO, itemPedidoDTO, historicoStatus, statusPedido, total, dataPedido, cupomAplicado, usuarioDTO } = pedido;
+    const {  itemPedidoDTO, historicoStatus, statusPedido, total, dataPedido, cupomAplicado, usuarioDTO } = pedido;
 
     return (
         <Box display="flex" flexDirection="column" minHeight="100vh">

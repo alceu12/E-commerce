@@ -5,7 +5,6 @@ import {
     Box,
     Typography,
     List,
-    ListItem,
     ListItemText,
     ListItemSecondaryAction,
     IconButton,

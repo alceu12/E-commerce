@@ -27,9 +27,6 @@ const ProdutoDetalhes = () => {
   const [editedProduto, setEditedProduto] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
 
-  useEffect(() => {
-    fetchProduto();
-  }, []);
 
   const fetchProduto = async () => {
     try {

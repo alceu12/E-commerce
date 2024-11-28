@@ -77,14 +77,7 @@ const Produto = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        try {
-            await deleteProduct(id);
-            fetchProdutos();
-        } catch (error) {
-            console.error("Erro ao deletar o produto", error);
-        }
-    };
+
 
     const fetchProdutos = async () => {
         try {
