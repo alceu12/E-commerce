@@ -41,7 +41,7 @@ function Login() {
             >
                 <Paper elevation={6} sx={{ p: 4, maxWidth: 400, width: '100%' }}>
                     <Typography variant="h5" component="h1" align="center" gutterBottom>
-                        Login
+                        Teste Kaio
                     </Typography>
                     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                     <form onSubmit={handleLogin}>
