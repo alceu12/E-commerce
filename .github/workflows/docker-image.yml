@@ -48,7 +48,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    depends: build-and-test
+
     steps:
       # 9. Deploy do backend no Render
       - name: Deploy Backend
