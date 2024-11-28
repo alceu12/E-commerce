@@ -47,8 +47,9 @@ jobs:
           npm run build  # Build do frontend
 
   deploy:
+    needs: build-and-test
     runs-on: ubuntu-latest
-
+    
     steps:
       # 9. Deploy do backend no Render
       - name: Deploy Backend
