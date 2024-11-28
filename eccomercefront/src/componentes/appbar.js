@@ -43,7 +43,6 @@ function ResponsiveAppBar() {
             const currentTime = Date.now() / 1000;
             if (decodedToken.exp < currentTime) {
               // Token expirado
-              handleLogout();
             } else {
               setIsLoggedIn(true);
               setUser({
@@ -54,13 +53,12 @@ function ResponsiveAppBar() {
             }
           } catch (error) {
             console.error('Erro ao decodificar o token:', error);
-            handleLogout();
           }
         } else {
           setIsLoggedIn(false);
           setUser(null);
         }
-      }, [handleLogout]);
+      }, []);
 
     useEffect(() => {
         const total = carrinho && carrinho.itens
@@ -108,7 +106,6 @@ function ResponsiveAppBar() {
                 navigate('/pedidos'); // Link correto para "Meus Pedidos"
                 break;
             case 'Sair':
-                handleLogout();
                 break;
             case 'Entrar':
                 navigate('/login');
