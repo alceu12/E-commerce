@@ -45,8 +45,6 @@ jobs:
         run: |
           cd eccomercefront
           npm run build  # Build do frontend
-        env:
-           CI: false 
 
   deploy:
     needs: build-and-test
