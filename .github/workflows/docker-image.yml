@@ -48,7 +48,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    depends-on: build-and-test  # Define que o job depende do job 'build-and-test'
+    needs: build-and-test
     steps:
       # 9. Deploy do backend no Render
       - name: Deploy Backend
