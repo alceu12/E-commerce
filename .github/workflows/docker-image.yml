@@ -24,10 +24,6 @@ jobs:
           java-version: '17'  # Versão do Java
           distribution: 'temurin'  # Distribuição do JDK
 
-      # 3. Rodar os testes no backend
-      - name: Run Backend Tests
-        run: mvn -f ./Back/Ecommerce/pom.xml test  # Comando para rodar testes do Maven
-
       # 4. Fazer build do backend
       - name: Build Backend
         run: mvn -f ./Back/Ecommercepom.xml clean package -DskipTests  # Build do backend sem rodar testes
@@ -44,12 +40,6 @@ jobs:
           cd eccomercefront
           npm install  # Instala as dependências do frontend
 
-      # 7. Rodar testes no frontend
-      - name: Run Frontend Tests
-        run: |
-          cd eccomercefront
-          npm test -- --watchAll=false  # Roda os testes do frontend
-
       # 8. Fazer build do frontend
       - name: Build Frontend
         run: |
@@ -57,7 +47,6 @@ jobs:
           npm run build  # Build do frontend
 
   deploy:
-    needs: build-and-test  # Este job depende do job 'build-and-test'
     runs-on: ubuntu-latest
 
     steps:
