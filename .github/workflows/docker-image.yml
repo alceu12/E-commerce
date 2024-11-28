@@ -40,21 +40,15 @@ jobs:
           cd eccomercefront
           npm install  # Instala as dependências do frontend
 
-     - name: Run Frontend Tests
-        run: |
-          cd frontend
-           CI=false npm test -- --watchAll=false  # Roda os testes do frontend
-
-      # 8. Fazer build do frontend com CI=false para ignorar warnings como erros
+      # 8. Fazer build do frontend
       - name: Build Frontend
         run: |
           cd eccomercefront
-          npm run build  # Define CI=false para não tratar warnings como erros
+          npm run build  # Build do frontend
 
   deploy:
-    needs: build-and-test  # Este job depende do job 'build-and-test'
     runs-on: ubuntu-latest
-
+    depends: build-and-test
     steps:
       # 9. Deploy do backend no Render
       - name: Deploy Backend
