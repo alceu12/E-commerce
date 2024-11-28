@@ -17,7 +17,6 @@ import {
     createProduct,
     getProducts,
     updateProduct,
-    deleteProduct,
 } from "./ServiceAdmin/ProdutoService";
 import { getCategories } from "./ServiceAdmin/CategoriaService";
 import { DataGrid } from "@mui/x-data-grid";
