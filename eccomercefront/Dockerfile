@@ -1,32 +1,35 @@
-# Etapa 1: Build do Frontend
-FROM node:18 AS build
+# Etapa 1: Construir o aplicativo React
+FROM node:18-alpine AS build
 
 # Definir o diretório de trabalho
 WORKDIR /app
 
 # Copiar package.json e package-lock.json
-COPY eccomercefront/package*.json ./
+COPY package*.json ./
 
-# Instalar dependências
+# Instalar as dependências
 RUN npm install
 
 # Copiar o restante do código
-COPY eccomercefront/ ./
+COPY . .
 
-# Build da aplicação
+# Construir o aplicativo para produção
 RUN npm run build
 
-# Etapa 2: Servir com Nginx
+# Etapa 2: Servir o aplicativo com Nginx
 FROM nginx:alpine
 
-# Copiar a configuração personalizada do Nginx
-COPY eccomercefront/nginx.conf /etc/nginx/conf.d/default.conf
+# Remover a configuração padrão do Nginx
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Copiar os arquivos buildados para o diretório padrão do Nginx
+# Copiar a configuração personalizada do Nginx
+COPY nginx.conf /etc/nginx/conf.d/
+
+# Copiar os arquivos de build para o diretório padrão do Nginx
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expor a porta 80
+# Expor a porta padrão do Nginx
 EXPOSE 80
 
-# Comando para executar o Nginx
+# Comando para manter o Nginx em execução
 CMD ["nginx", "-g", "daemon off;"]
