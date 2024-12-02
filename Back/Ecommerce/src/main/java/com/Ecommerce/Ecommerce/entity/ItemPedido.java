@@ -26,4 +26,8 @@ public class ItemPedido {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "produto_id", referencedColumnName = "id")
     private Produto produto;
+
+    @ManyToOne
+    @JoinColumn(name = "pedido_id")
+    private Pedido pedido;
 }

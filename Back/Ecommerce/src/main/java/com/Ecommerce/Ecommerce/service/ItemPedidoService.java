@@ -25,7 +25,6 @@ public class ItemPedidoService {
     public ItemPedidoDTO criarItemPedido(ItemPedidoDTO itemPedidoDTO) {
         // Converter DTO para entidade itempedido
         ItemPedido itemPedido = ItemPedidoMapper.toEntity(itemPedidoDTO);
-
         // Buscar e associar o produto usando o ID
         if (itemPedido.getProduto() != null && itemPedido.getProduto().getId() != null) {
             Optional<Produto> produtoOptional = produtoRepository.findById(itemPedido.getProduto().getId());
@@ -35,6 +34,13 @@ public class ItemPedidoService {
                 throw new RuntimeException("Endereço com ID " + itemPedido.getProduto().getId() + " não encontrado.");
             }
         }
+        assert itemPedido.getProduto() != null;
+        if (itemPedido.getQuantidade() > itemPedido.getProduto().getEstoque()
+                || itemPedido.getQuantidade() <= 0) {
+            throw new RuntimeException("Quantidade inválida");
+        }
+        itemPedido.getProduto().setEstoque(itemPedido.getProduto().getEstoque() - itemPedido.getQuantidade());
+        itemPedido.setPrecoUnitario(itemPedido.getProduto().getValor());
         itemPedido = itemPedidoRepository.save(itemPedido);
         return ItemPedidoMapper.toDTO(itemPedido);
     }
@@ -69,7 +75,7 @@ public class ItemPedidoService {
 
     public boolean deletarItemPedido(Long id) {
         Optional<ItemPedido> itemPedidoExistente = itemPedidoRepository.findById(id);
-        if(itemPedidoExistente.isPresent()){
+        if (itemPedidoExistente.isPresent()) {
             itemPedidoRepository.deleteById(id);
             return true;
         } else {

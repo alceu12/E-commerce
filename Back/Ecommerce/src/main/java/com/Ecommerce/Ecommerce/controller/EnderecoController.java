@@ -3,8 +3,15 @@ package com.Ecommerce.Ecommerce.controller;
 import java.util.List;
 import java.util.Optional;
 
+import com.Ecommerce.Ecommerce.entity.Endereco;
+import com.Ecommerce.Ecommerce.entity.Usuario;
+import com.Ecommerce.Ecommerce.repository.UsuarioRepository;
+import com.Ecommerce.Ecommerce.service.TokenService;
+import com.Ecommerce.Ecommerce.util.EnderecoMapper;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +37,7 @@ public class EnderecoController {
     }
 
     @GetMapping
-    public ResponseEntity <List<EnderecoDTO>> obterTodosEndereco() {
+    public ResponseEntity<List<EnderecoDTO>> obterTodosEndereco() {
         List<EnderecoDTO> enderecoDTO = enderecoService.obterTodosEndereco();
         return ResponseEntity.ok(enderecoDTO);
     }
@@ -40,16 +47,10 @@ public class EnderecoController {
         EnderecoDTO endereco = enderecoService.obterEnderecoPorId(id);
         return ResponseEntity.ok(endereco);
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<EnderecoDTO> atualizarEndereco(@PathVariable Long id, @RequestBody EnderecoDTO enderecoDTO) {
-        EnderecoDTO enderecoAtualizado = enderecoService.atualizarEndereco(id, enderecoDTO);
-        return ResponseEntity.ok(enderecoAtualizado);
-    }
-
     @SuppressWarnings("rawtypes")
     @DeleteMapping("/{id}")
     public Optional deletarEndereco(@PathVariable Long id) {
         return Optional.ofNullable(enderecoService.deletarEndereco(id));
     }
+
 }

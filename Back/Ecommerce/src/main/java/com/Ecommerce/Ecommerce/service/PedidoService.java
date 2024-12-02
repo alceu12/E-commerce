@@ -1,18 +1,20 @@
 package com.Ecommerce.Ecommerce.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.Ecommerce.Ecommerce.dto.ItemPedidoDTO;
+import com.Ecommerce.Ecommerce.entity.*;
+import com.Ecommerce.Ecommerce.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.Ecommerce.Ecommerce.dto.PedidoDTO;
-import com.Ecommerce.Ecommerce.entity.Status;
-import com.Ecommerce.Ecommerce.entity.Usuario;
-import com.Ecommerce.Ecommerce.entity.Pedido;
-import com.Ecommerce.Ecommerce.repository.StatusRepository;
-import com.Ecommerce.Ecommerce.repository.UsuarioRepository;
-import com.Ecommerce.Ecommerce.repository.PedidoRepository;
 import com.Ecommerce.Ecommerce.util.PedidoMapper;
 
 @Service
@@ -21,37 +23,69 @@ public class PedidoService {
     private PedidoRepository pedidoRepository;
 
     @Autowired
-    private StatusRepository statusRepository;
-
-    @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private CupomRepository cupomRepository;
+
+    @Autowired
+    private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private ItemPedidoRepository itemPedidoRepository;
+
     public PedidoDTO criarPedido(PedidoDTO pedidoDTO) {
-        // Converter DTO para entidade pedido
-        Pedido pedido = PedidoMapper.toEntity(pedidoDTO);
+        Pedido pedido = new Pedido();
 
-        // Buscar e associar o status usando o ID
-        if (pedido.getStatus() != null && pedido.getStatus().getId() != null) {
-            Optional<Status> statusOptional = statusRepository.findById(pedido.getStatus().getId());
-            if (statusOptional.isPresent()) {
-                pedido.setStatus(statusOptional.get());
-            } else {
-                throw new RuntimeException("Status com ID " + pedido.getStatus().getId() + " não encontrado.");
+        // Definir o usuário
+        Usuario usuario = usuarioRepository.findById(pedidoDTO.getUsuarioDTO().getId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+        pedido.setUsuario(usuario);
+
+        // Definir o status como PENDING_PAYMENT
+        pedido.setStatusPedido(StatusPedido.PENDING_PAYMENT);
+
+        // Buscar e associar os ItemPedido existentes
+        List<ItemPedido> itens = new ArrayList<>();
+        for (ItemPedidoDTO itemDTO : pedidoDTO.getItemPedidoDTO()) {
+            ItemPedido item = itemPedidoRepository.findById(itemDTO.getId())
+                    .orElseThrow(() -> new RuntimeException("ItemPedido com ID " + itemDTO.getId() + " não encontrado."));
+            itens.add(item);
+        }
+        pedido.setItemPedido(itens);
+
+        // Calcular o total do pedido
+        double total = itens.stream()
+                .mapToDouble(item -> item.getPrecoUnitario() * item.getQuantidade())
+                .sum();
+
+        // Aplicar desconto do cupom se houver
+        if (pedidoDTO.getCupomAplicado() != null && pedidoDTO.getCupomAplicado().getId() != null) {
+            Cupom cupom = cupomRepository.findById(pedidoDTO.getCupomAplicado().getId())
+                    .orElseThrow(() -> new RuntimeException("Cupom não encontrado."));
+
+            // Validar data do cupom
+            // Aplicar desconto se o valor mínimo for atingido
+            if (cupom.getValorMinimo() <= total) {
+                double desconto = total * cupom.getValorDesconto();
+                total -= desconto;
             }
+
+            pedido.setCupomAplicado(cupom);
+        } else {
+            pedido.setCupomAplicado(null); // Define o cupom como nulo se não houver
         }
 
-        if (pedido.getUsuario() != null && pedido.getUsuario().getId() != null) {
-            Optional<Usuario> usuarioOptional = usuarioRepository.findById(pedido.getUsuario().getId());
-            if (usuarioOptional.isPresent()) {
-                pedido.setUsuario(usuarioOptional.get());
-            } else {
-                throw new RuntimeException("Usuario com ID " + pedido.getUsuario().getId() + " não encontrado.");
-            }
-        }
+        pedido.setTotal(total);
+        pedido.setDataPedido(LocalDate.now());
+        pedido.setDataEntrega(null);
 
-        pedido = pedidoRepository.save(pedido);
-        return PedidoMapper.toDTO(pedido);
+        // Salvar o pedido
+        Pedido pedidoSalvo = pedidoRepository.save(pedido);
+
+        return PedidoMapper.toDTO(pedidoSalvo);
     }
+
 
     public List<PedidoDTO> obterTodosPedidos() {
         return pedidoRepository.findAll().stream()
@@ -71,10 +105,6 @@ public class PedidoService {
 
         pedidoExistente.setTotal(pedidoDTO.getTotal());
 
-        if (pedidoDTO.getStatusDTO() != null && pedidoDTO.getStatusDTO().getId() != null) {
-            Optional<Status> statusOptional = statusRepository.findById(pedidoDTO.getStatusDTO().getId());
-            statusOptional.ifPresent(pedidoExistente::setStatus);
-        }
 
         if (pedidoDTO.getUsuarioDTO() != null && pedidoDTO.getUsuarioDTO().getId() != null) {
             Optional<Usuario> usuarioOptional = usuarioRepository.findById(pedidoDTO.getUsuarioDTO().getId());
@@ -87,11 +117,27 @@ public class PedidoService {
 
     public boolean deletarPedido(Long id) {
         Optional<Pedido> pedidoExistente = pedidoRepository.findById(id);
-        if(pedidoExistente.isPresent()){
+        if (pedidoExistente.isPresent()) {
             pedidoRepository.deleteById(id);
             return true;
         } else {
             return false;
         }
+    }
+
+    public PedidoDTO atualizarStatusPedido(Long id, StatusPedido statusPedido) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
+
+        pedido.setStatusPedido(statusPedido);
+        Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+
+        return PedidoMapper.toDTO(pedidoAtualizado);
+    }
+
+    public List<PedidoDTO> obterPedidosPorUsuario(Long usuarioId) {
+        return pedidoRepository.findAllByUsuarioIdOrderByDataPedidoDesc(usuarioId).stream()
+                .map(PedidoMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -48,7 +48,7 @@ public class EnderecoService {
 
     public boolean deletarEndereco(Long id) {
         Optional<Endereco> enderecoExistente = enderecoRepository.findById(id);
-        if(enderecoExistente.isPresent()){
+        if (enderecoExistente.isPresent()) {
             enderecoRepository.deleteById(id);
             return true;
         } else {

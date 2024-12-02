@@ -4,23 +4,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.Ecommerce.Ecommerce.dto.EnderecoDTO;
+import com.Ecommerce.Ecommerce.entity.StatusUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
 import com.Ecommerce.Ecommerce.entity.Endereco;
 import com.Ecommerce.Ecommerce.entity.Funcao;
-import com.Ecommerce.Ecommerce.entity.Status;
 import com.Ecommerce.Ecommerce.entity.Usuario;
 import com.Ecommerce.Ecommerce.repository.EnderecoRepository;
 import com.Ecommerce.Ecommerce.repository.FuncaoRepository;
-import com.Ecommerce.Ecommerce.repository.StatusRepository;
 import com.Ecommerce.Ecommerce.repository.UsuarioRepository;
 import com.Ecommerce.Ecommerce.util.UsuarioMapper;
 import com.Ecommerce.Ecommerce.util.ValidaEmail;
 
-import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class UsuarioService {
@@ -34,11 +34,11 @@ public class UsuarioService {
     private FuncaoRepository funcaoRepository;
 
     @Autowired
-    private StatusRepository statusRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<UsuarioDTO> criarUsuario(UsuarioDTO usuarioDTO, HttpServletResponse response) {
+    public ResponseEntity<UsuarioDTO> criarUsuario(UsuarioDTO usuarioDTO) {
         // Validar o email
-        if (!ValidaEmail.validarCaracterArroba(usuarioDTO.getEmail())){
+        if (!ValidaEmail.validarCaracterArroba(usuarioDTO.getEmail())) {
             return ResponseEntity.status(422).build();
         }
         // Converter DTO para entidade usuario
@@ -61,18 +61,10 @@ public class UsuarioService {
                 throw new RuntimeException("Funcao com ID " + usuario.getFuncao().getId() + " não encontrado.");
             }
         }
-        if (usuario.getStatus() != null && usuario.getStatus().getId() != null) {
-            Optional<Status> statusOptional = statusRepository.findById(usuario.getStatus().getId());
-            if (statusOptional.isPresent()) {
-                usuario.setStatus(statusOptional.get());
-            } else {
-                throw new RuntimeException("Funcao com ID " + usuario.getStatus().getId() + " não encontrado.");
-            }
-        }
 
         UsuarioDTO usuarioSalvoDTO = UsuarioMapper.toDTO(usuarioRepository.save(usuario));
-        
-        usuario = usuarioRepository.save(usuario);
+        usuario.setStatusUser(StatusUser.ACTIVE);
+        usuarioRepository.save(usuario);
         return ResponseEntity.ok(usuarioSalvoDTO);
     }
 
@@ -95,18 +87,14 @@ public class UsuarioService {
         usuarioExistente.setNome(usuarioDTO.getNome());
         usuarioExistente.setEmail(usuarioDTO.getEmail());
         usuarioExistente.setPassword(usuarioDTO.getPassword());
-
+        usuarioExistente.setStatusUser(StatusUser.valueOf(usuarioDTO.getStatusUser()));
         if (usuarioDTO.getEnderecoDTO() != null && usuarioDTO.getEnderecoDTO().getId() != null) {
             Optional<Endereco> enderecoOptional = enderecoRepository.findById(usuarioDTO.getEnderecoDTO().getId());
             enderecoOptional.ifPresent(usuarioExistente::setEndereco);
-        }    
+        }
         if (usuarioDTO.getFuncaoDTO() != null && usuarioDTO.getFuncaoDTO().getId() != null) {
             Optional<Funcao> funcaoOptional = funcaoRepository.findById(usuarioDTO.getFuncaoDTO().getId());
             funcaoOptional.ifPresent(usuarioExistente::setFuncao);
-        }
-        if (usuarioDTO.getStatusDTO() != null && usuarioDTO.getStatusDTO().getId() != null) {
-            Optional<Status> statusOptional = statusRepository.findById(usuarioDTO.getStatusDTO().getId());
-            statusOptional.ifPresent(usuarioExistente::setStatus);
         }
 
         Usuario usuarioAtualizado = usuarioRepository.save(usuarioExistente);
@@ -115,11 +103,58 @@ public class UsuarioService {
 
     public boolean deletarUsuario(Long id) {
         Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
-        if(usuarioExistente.isPresent()){
-            usuarioRepository.deleteById(id);
+        if (usuarioExistente.isPresent()) {
+            Usuario usuario = usuarioExistente.get();
+            usuario.setStatusUser(StatusUser.DELETED);
+            usuarioRepository.save(usuario);
             return true;
         } else {
             return false;
         }
     }
+
+    public boolean existsByEmail(String email) {
+        return usuarioRepository.existsByEmail(email);
+    }
+
+    public void updatePassword(String email, String newPassword) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        usuario.setPassword(passwordEncoder.encode(newPassword));
+        usuarioRepository.save(usuario);
+    }
+
+    public String atualizarEndereco(Long userId, EnderecoDTO enderecoDTO) throws Exception {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(userId);
+        if (!usuarioOpt.isPresent()) {
+            throw new Exception("Usuário não encontrado.");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        Endereco endereco = usuario.getEndereco();
+
+        if (endereco == null) {
+            // Criar novo endereço
+            endereco = new Endereco();
+        }
+
+        // Atualizar os campos do endereço
+        endereco.setCep(enderecoDTO.getCep());
+        endereco.setRua(enderecoDTO.getRua());
+        endereco.setNumero(enderecoDTO.getNumero());
+        endereco.setComplemento(enderecoDTO.getComplemento());
+
+        // Associar o endereço ao usuário
+        usuario.setEndereco(endereco);
+        usuario.setStatusUser(StatusUser.ACTIVE);
+        // Salvar o usuário (cascade salvará o endereço)
+        usuarioRepository.save(usuario);
+
+        return "Endereço atualizado com sucesso.";
+    }
+
+    public boolean verifyIfUserExists(String login) {
+        return usuarioRepository.existsByLogin(login);
+    }
+
 }
