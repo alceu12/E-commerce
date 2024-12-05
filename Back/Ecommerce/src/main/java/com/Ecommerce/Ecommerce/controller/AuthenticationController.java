@@ -3,7 +3,9 @@ package com.Ecommerce.Ecommerce.controller;
 import java.util.Optional;
 
 import com.Ecommerce.Ecommerce.service.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -163,6 +165,22 @@ public class AuthenticationController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<String> validateToken(HttpServletRequest request) {
+        // Recupera o token do cabeçalho Authorization
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // Remove 'Bearer ' do início
+            String subject = tokenService.validateToken(token);
+            if (subject != null) {
+                // Token é válido
+                return ResponseEntity.ok("Token válido");
+            }
+        }
+        // Token inválido ou não fornecido
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
     }
 
 }

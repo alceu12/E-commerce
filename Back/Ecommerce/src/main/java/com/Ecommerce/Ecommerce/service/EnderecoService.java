@@ -42,6 +42,9 @@ public class EnderecoService {
         enderecoExistente.setRua(enderecoDTO.getRua());
         enderecoExistente.setNumero(enderecoDTO.getNumero());
         enderecoExistente.setComplemento(enderecoDTO.getComplemento());
+        enderecoExistente.setBairro(enderecoDTO.getBairro());
+        enderecoExistente.setCidade(enderecoDTO.getCidade());
+        enderecoExistente.setEstado(enderecoDTO.getEstado());
         Endereco enderecoAtualizado = enderecoRepository.save(enderecoExistente);
         return EnderecoMapper.toDTO(enderecoAtualizado);
     }
