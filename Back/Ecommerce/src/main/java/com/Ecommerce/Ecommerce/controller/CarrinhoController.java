@@ -29,6 +29,10 @@ public class CarrinhoController {
     public ResponseEntity<CarrinhoDTO> limparCarrinho() {
         return ResponseEntity.ok(carrinhoService.limparCarrinho());
     }
+    @DeleteMapping("/finalizar")
+    public ResponseEntity<CarrinhoDTO> finalizarCarrinho() {
+        return ResponseEntity.ok(carrinhoService.finalizarCarrinho());
+    }
 
     @GetMapping
     public ResponseEntity<CarrinhoDTO> obterCarrinho() {

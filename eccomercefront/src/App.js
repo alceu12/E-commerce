@@ -16,7 +16,7 @@ import Signup from './componentes/auth/Signup';
 import ForgotPassword from './componentes/auth/ForgotPassword';
 import Profile from './componentes/perfil/Profile';
 import PrivateRoute from './componentes/auth/PrivateRoute';
-
+import GerenciarPedidos from './componentes/AdminPage/GerenciarPedidos';
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -34,6 +34,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro" element={<Signup />} />
             <Route path="/esqueceu-senha" element={<ForgotPassword />} />
+            <Route path="/admin/gerenciar-pedidos" element={<GerenciarPedidos />} />
             <Route
               path="/profile"
               element={

@@ -1,5 +1,3 @@
-// src/componentes/perfil/Profile.js
-
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -23,7 +21,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     checkEmailAvailability,
     validatePassword
-} from '../functions/ValidationFunctions'; // Importando apenas as funções necessárias
+} from '../functions/ValidationFunctions';
 
 function Profile() {
     const navigate = useNavigate();
@@ -37,6 +35,9 @@ function Profile() {
         rua: '',
         numero: '',
         complemento: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -74,6 +75,9 @@ function Profile() {
                                     rua: data.enderecoDTO.rua || '',
                                     numero: data.enderecoDTO.numero || '',
                                     complemento: data.enderecoDTO.complemento || '',
+                                    bairro: data.enderecoDTO.bairro || '',
+                                    cidade: data.enderecoDTO.cidade || '',
+                                    estado: data.enderecoDTO.estado || '',
                                 });
                             }
                         })
@@ -92,6 +96,47 @@ function Profile() {
             navigate('/login');
         }
     }, [navigate]);
+
+    // useEffect para buscar o endereço pelo CEP
+    useEffect(() => {
+        const fetchAddress = async () => {
+            const cep = addressData.cep.replace(/\D/g, ''); // Remove caracteres não numéricos
+            if (cep.length === 8) {
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await response.json();
+                    if (data.erro) {
+                        setError('CEP não encontrado.');
+                        // Limpa os campos caso o CEP seja inválido
+                        setAddressData((prevState) => ({
+                            ...prevState,
+                            rua: '',
+                            bairro: '',
+                            cidade: '',
+                            estado: '',
+                        }));
+                    } else {
+                        setError('');
+                        // Atualiza os campos com os dados retornados
+                        setAddressData((prevState) => ({
+                            ...prevState,
+                            rua: data.logradouro,
+                            bairro: data.bairro,
+                            cidade: data.localidade,
+                            estado: data.uf,
+                        }));
+                    }
+                } catch (err) {
+                    console.error('Erro ao buscar o CEP:', err);
+                    setError('Erro ao buscar o CEP.');
+                }
+            }
+        };
+
+        if (addressData.cep) {
+            fetchAddress();
+        }
+    }, [addressData.cep]);
 
     const handlePasswordChange = (e) => {
         setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
@@ -176,6 +221,9 @@ function Profile() {
                 rua: addressData.rua,
                 numero: addressData.numero,
                 complemento: addressData.complemento,
+                bairro: addressData.bairro,
+                cidade: addressData.cidade,
+                estado: addressData.estado,
             };
             await authService.updateAddress(userData.id, enderecoDataToUpdate);
             setSuccess('Endereço atualizado com sucesso!');
@@ -218,35 +266,32 @@ function Profile() {
                                     <Typography variant="subtitle1">E-mail</Typography>
                                     <Typography variant="body1">{userData.email}</Typography>
                                 </Box>
-                                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-                                {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
                             </CardContent>
                             <CardActions>
-                                {/* Botão para editar senha */}
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    fullWidth
-                                    startIcon={<FontAwesomeIcon icon={faEdit} />}
-                                    onClick={() => setEditPassword(!editPassword)}
-                                    sx={{ mb: 1 }}
-                                >
-                                    {editPassword ? 'Cancelar' : 'Alterar Senha'}
-                                </Button>
-                                {/* Botão para editar e-mail */}
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    fullWidth
-                                    startIcon={<FontAwesomeIcon icon={faEdit} />}
-                                    onClick={() => setEditEmail(!editEmail)}
-                                >
-                                    {editEmail ? 'Cancelar' : 'Alterar E-mail'}
-                                </Button>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1 }}>
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        startIcon={<FontAwesomeIcon icon={faEdit} />}
+                                        onClick={() => setEditPassword(!editPassword)}
+                                    >
+                                        {editPassword ? 'Cancelar' : 'Alterar Senha'}
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        startIcon={<FontAwesomeIcon icon={faEdit} />}
+                                        onClick={() => setEditEmail(!editEmail)}
+                                    >
+                                        {editEmail ? 'Cancelar' : 'Alterar E-mail'}
+                                    </Button>
+                                </Box>
                             </CardActions>
                             {/* Formulário de alteração de senha */}
                             <Collapse in={editPassword}>
                                 <CardContent>
+                                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                                    {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
                                     <form onSubmit={handleSubmitPassword}>
                                         <TextField
                                             label="Senha Atual"
@@ -258,8 +303,6 @@ function Profile() {
                                             onChange={handlePasswordChange}
                                             sx={{ mb: 2 }}
                                             required
-                                            error={passwordData.currentPassword.trim() === ''}
-                                            helperText={passwordData.currentPassword.trim() === '' ? 'Senha atual necessária.' : ''}
                                         />
                                         <TextField
                                             label="Nova Senha"
@@ -271,26 +314,6 @@ function Profile() {
                                             onChange={handlePasswordChange}
                                             sx={{ mb: 2 }}
                                             required
-                                            error={
-                                                !passwordData.newPassword ||
-                                                !validatePassword(passwordData.newPassword).length ||
-                                                !validatePassword(passwordData.newPassword).number ||
-                                                !validatePassword(passwordData.newPassword).specialChar ||
-                                                !validatePassword(passwordData.newPassword).noWhitespace
-                                            }
-                                            helperText={
-                                                !passwordData.newPassword
-                                                    ? 'Nova senha necessária.'
-                                                    : !validatePassword(passwordData.newPassword).length
-                                                        ? 'A senha deve ter pelo menos 4 caracteres.'
-                                                        : !validatePassword(passwordData.newPassword).number
-                                                            ? 'A senha deve conter pelo menos 1 número.'
-                                                            : !validatePassword(passwordData.newPassword).specialChar
-                                                                ? 'A senha deve conter pelo menos 1 caractere especial.'
-                                                                : !validatePassword(passwordData.newPassword).noWhitespace
-                                                                    ? 'A senha não pode conter espaços.'
-                                                                    : ''
-                                            }
                                         />
                                         <Button
                                             type="submit"
@@ -307,6 +330,8 @@ function Profile() {
                             {/* Formulário de alteração de e-mail */}
                             <Collapse in={editEmail}>
                                 <CardContent>
+                                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                                    {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
                                     <form onSubmit={handleSubmitEmail}>
                                         <TextField
                                             label="Novo E-mail"
@@ -318,17 +343,6 @@ function Profile() {
                                             onChange={handleEmailUpdateChange}
                                             sx={{ mb: 2 }}
                                             required
-                                            error={
-                                                !emailUpdate.newEmail ||
-                                                !checkEmailAvailability(emailUpdate.newEmail).isValid
-                                            }
-                                            helperText={
-                                                !emailUpdate.newEmail
-                                                    ? 'Novo e-mail necessário.'
-                                                    : !checkEmailAvailability(emailUpdate.newEmail).isValid
-                                                        ? 'E-mail inválido ou já cadastrado.'
-                                                        : ''
-                                            }
                                         />
                                         <Button
                                             type="submit"
@@ -352,6 +366,8 @@ function Profile() {
                                 <Typography variant="h6" gutterBottom>
                                     Endereço
                                 </Typography>
+                                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                                {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
                                 <form onSubmit={handleSubmitAddress}>
                                     <TextField
                                         label="CEP"
@@ -373,16 +389,16 @@ function Profile() {
                                         value={addressData.rua}
                                         onChange={handleAddressChange}
                                         sx={{ mb: 2 }}
-                                        required
-                                        error={addressData.rua.trim() === ''}
-                                        helperText={addressData.rua.trim() === '' ? 'Rua necessária.' : ''}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
                                     />
                                     <TextField
                                         label="Número"
                                         variant="outlined"
                                         fullWidth
                                         name="numero"
-                                        type="number"
+                                        type="text"
                                         value={addressData.numero}
                                         onChange={handleAddressChange}
                                         sx={{ mb: 2 }}
@@ -398,6 +414,42 @@ function Profile() {
                                         value={addressData.complemento}
                                         onChange={handleAddressChange}
                                         sx={{ mb: 2 }}
+                                    />
+                                    <TextField
+                                        label="Bairro"
+                                        variant="outlined"
+                                        fullWidth
+                                        name="bairro"
+                                        value={addressData.bairro}
+                                        onChange={handleAddressChange}
+                                        sx={{ mb: 2 }}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                    <TextField
+                                        label="Cidade"
+                                        variant="outlined"
+                                        fullWidth
+                                        name="cidade"
+                                        value={addressData.cidade}
+                                        onChange={handleAddressChange}
+                                        sx={{ mb: 2 }}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                    <TextField
+                                        label="Estado"
+                                        variant="outlined"
+                                        fullWidth
+                                        name="estado"
+                                        value={addressData.estado}
+                                        onChange={handleAddressChange}
+                                        sx={{ mb: 2 }}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
                                     />
                                     <Button
                                         type="submit"
@@ -418,7 +470,6 @@ function Profile() {
             <FooterComponent />
         </Box>
     );
-
 }
 
 export default Profile;

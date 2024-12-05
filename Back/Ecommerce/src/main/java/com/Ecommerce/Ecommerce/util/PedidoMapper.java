@@ -1,9 +1,6 @@
 package com.Ecommerce.Ecommerce.util;
 
-import com.Ecommerce.Ecommerce.dto.PedidoDTO;
-import com.Ecommerce.Ecommerce.dto.CupomDTO;
-import com.Ecommerce.Ecommerce.dto.UsuarioDTO;
-import com.Ecommerce.Ecommerce.dto.ItemPedidoDTO;
+import com.Ecommerce.Ecommerce.dto.*;
 import com.Ecommerce.Ecommerce.entity.*;
 
 import java.util.List;
@@ -47,6 +44,10 @@ public class PedidoMapper {
             CupomDTO cupomDTO = CupomMapper.toDTO(pedido.getCupomAplicado());
             dto.setCupomAplicado(cupomDTO);
         }
+        if (pedido.getEnderecoEntrega() != null) {
+            EnderecoDTO enderecoDTO = EnderecoMapper.toDTO(pedido.getEnderecoEntrega());
+            dto.setEnderecoEntrega(enderecoDTO);
+        }
 
         return dto;
     }
@@ -81,6 +82,16 @@ public class PedidoMapper {
             pedido.setCupomAplicado(cupom);
         }
 
+        if (dto.getEnderecoEntrega() != null) {
+            Endereco endereco = EnderecoMapper.toEntity(dto.getEnderecoEntrega());
+            pedido.setEnderecoEntrega(endereco);
+        }
         return pedido;
+    }
+
+    public static void updateStatusFromDTO(Pedido pedido, UpdateStatusDTO updateStatusDTO) {
+        if (updateStatusDTO.getStatusPedido() != null) {
+            pedido.setStatusPedido(updateStatusDTO.getStatusPedido());
+        }
     }
 }

@@ -20,5 +20,5 @@ public class PedidoDTO {
     private List<ItemPedidoDTO> itemPedidoDTO;
     private UsuarioDTO usuarioDTO;
     private CupomDTO cupomAplicado;
-
+    private EnderecoDTO enderecoEntrega;
 }

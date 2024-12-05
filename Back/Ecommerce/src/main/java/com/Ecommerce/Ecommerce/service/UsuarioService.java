@@ -143,6 +143,9 @@ public class UsuarioService {
         endereco.setRua(enderecoDTO.getRua());
         endereco.setNumero(enderecoDTO.getNumero());
         endereco.setComplemento(enderecoDTO.getComplemento());
+        endereco.setBairro(enderecoDTO.getBairro());
+        endereco.setCidade(enderecoDTO.getCidade());
+        endereco.setEstado(enderecoDTO.getEstado());
 
         // Associar o endereço ao usuário
         usuario.setEndereco(endereco);

@@ -1,0 +1,59 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main  # Executa o workflow em pushs para a branch 'main'
+  pull_request:
+    branches:
+      - main  # Executa o workflow em pull requests para a branch 'main'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest  # Define o sistema operacional para rodar o job
+
+    steps:
+      # 1. Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v3  # Ação para fazer checkout do repositório
+
+      # 2. Configurar Java e Maven (Backend)
+      - name: Set up JDK
+        uses: actions/setup-java@v3  # Ação para configurar o JDK
+        with:
+          java-version: '17'  # Versão do Java
+          distribution: 'temurin'  # Distribuição do JDK
+
+      # 4. Fazer build do backend
+      - name: Build Backend
+        run: mvn -f ./Back/Ecommerce/pom.xml clean package -DskipTests  # Build do backend sem rodar testes
+
+      # 5. Configurar Node.js (Frontend)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3  # Ação para configurar o Node.js
+        with:
+          node-version: '18'  # Versão do Node.js
+
+      # 6. Instalar dependências do frontend
+      - name: Install Frontend Dependencies
+        run: |
+          cd eccomercefront
+          npm install  # Instala as dependências do frontend
+
+      # 8. Fazer build do frontend
+      - name: Build Frontend
+        run: |
+          cd eccomercefront
+          npm run build  # Build do frontend
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      # 9. Deploy do backend no Render
+      - name: Deploy Backend
+        run: curl -X POST "${{ secrets.BACKEND_RENDER_DEPLOY_HOOK }}"  # Faz deploy do backend
+
+      # 10. Deploy do frontend no Render
+      - name: Deploy Frontend
+        run: curl -X POST "${{ secrets.FRONTEND_RENDER_DEPLOY_HOOK }}"  # Faz deploy do frontend

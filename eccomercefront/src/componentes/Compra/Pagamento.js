@@ -1,4 +1,5 @@
 // src/componentes/Compra/Pagamento.jsx
+
 import React, { useState } from 'react';
 import {
     Box,
@@ -30,23 +31,20 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
 
         setLoading(true);
 
-        // Simular processamento de pagamento (por exemplo, integração com gateway de pagamento)
+        // Simular processamento de pagamento
         setTimeout(() => {
-            // Defina o novo status conforme o fluxo do seu negócio
-            // Exemplo: após pagamento, status muda para "PROCESSING"
-            const novoStatusDescricao = "Processando"; // Deve corresponder a uma descrição válida no enum
+            const novoStatusDescricao = "Processando";
 
             atualizarStatusPedido(pedido.id, novoStatusDescricao)
                 .then(() => {
                     setLoading(false);
-                    // Navegar para a página de pedidos após atualização bem-sucedida
                     navigate('/pedidos');
                 })
                 .catch(() => {
                     setLoading(false);
                     alert('Erro ao processar pagamento. Por favor, tente novamente.');
                 });
-        }, 2000); // Simulação de atraso no processamento
+        }, 2000);
     };
 
     return (
@@ -58,32 +56,81 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
                 Pedido ID: <strong>{pedido.id}</strong>
             </Typography>
             <Typography variant="body1">
-                Total: R$ {pedido.total.toFixed(2)}
+                Total: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(pedido.total)}
             </Typography>
+
             <Typography variant="body1">
                 Status: {statusMap[pedido.statusPedido]}
             </Typography>
+            <Typography variant="body1">
+                Frete:{' '}
+                <Typography
+                    component="span"
+                    variant="body1"
+                    sx={{
+                        textDecoration: 'line-through',
+                        color: 'gray',
+                    }}
+                >
+                    R$ 10,00
+                </Typography>{' '}
+                - Grátis
+            </Typography>
 
-            <Box sx={{ mt: 3 }}>
-                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                    <InputLabel>Forma de Pagamento</InputLabel>
+            <Box
+                sx={{
+                    mt: 3,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <FormControl variant="outlined" sx={{ mb: 2, width: '40%' }}>
+                    <InputLabel sx={{ fontSize: '0.8rem' }}>Forma de Pagamento</InputLabel>
                     <Select
                         value={formaPagamento}
                         onChange={(e) => setFormaPagamento(e.target.value)}
                         label="Forma de Pagamento"
+                        size="small"
+                        sx={{
+                            fontSize: '0.8rem',
+                        }}
+                        MenuProps={{
+                            PaperProps: {
+                                sx: {
+                                    fontSize: '0.8rem',
+                                },
+                            },
+                        }}
                     >
-                        <MenuItem value="cartao">Cartão de Crédito</MenuItem>
-                        <MenuItem value="pix">Pix</MenuItem>
+                        <MenuItem value="cartao" sx={{ fontSize: '0.8rem' }}>
+                            Cartão de Crédito
+                        </MenuItem>
+                        <MenuItem value="pix" sx={{ fontSize: '0.8rem' }}>
+                            Pix
+                        </MenuItem>
                     </Select>
                 </FormControl>
 
                 {formaPagamento === 'cartao' && (
-                    <Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                    >
                         <TextField
                             label="Número do Cartão"
                             variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
+                            size="small"
+                            sx={{ mb: 2, width: '250%' }}
+                            InputProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
+                            InputLabelProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
                             value={detalhesPagamento.numeroCartao || ''}
                             onChange={(e) =>
                                 setDetalhesPagamento({ ...detalhesPagamento, numeroCartao: e.target.value })
@@ -92,8 +139,14 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
                         <TextField
                             label="Nome no Cartão"
                             variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
+                            size="small"
+                            sx={{ mb: 2, width: '250%'  }}
+                            InputProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
+                            InputLabelProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
                             value={detalhesPagamento.nomeCartao || ''}
                             onChange={(e) =>
                                 setDetalhesPagamento({ ...detalhesPagamento, nomeCartao: e.target.value })
@@ -102,9 +155,15 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
                         <TextField
                             label="Validade"
                             variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
+                            size="small"
+                            sx={{ mb: 2, width: '250%'  }}
                             placeholder="MM/AA"
+                            InputProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
+                            InputLabelProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
                             value={detalhesPagamento.validade || ''}
                             onChange={(e) =>
                                 setDetalhesPagamento({ ...detalhesPagamento, validade: e.target.value })
@@ -113,8 +172,14 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
                         <TextField
                             label="CVV"
                             variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
+                            size="small"
+                            sx={{ mb: 2, width: '250%'  }}
+                            InputProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
+                            InputLabelProps={{
+                                style: { fontSize: '0.8rem' },
+                            }}
                             value={detalhesPagamento.cvv || ''}
                             onChange={(e) =>
                                 setDetalhesPagamento({ ...detalhesPagamento, cvv: e.target.value })
@@ -124,45 +189,55 @@ const Pagamento = ({ pedido, voltarEtapa }) => {
                 )}
 
                 {formaPagamento === 'pix' && (
-                    <Box>
-                        <Typography variant="body1" sx={{ mb: 2 }}>
+                    <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="body1" sx={{ mb: 2, fontSize: '0.8rem' }}>
                             Escaneie o QR Code abaixo ou utilize a chave Pix para efetuar o pagamento.
                         </Typography>
                         <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
-                            <img src="https://via.placeholder.com/200" alt="QR Code Pix" />
+                            <img
+                                src="https://codigosdebarrasbrasil.com.br/wp-content/uploads/2019/09/codigo_qr-300x300.png"
+                                alt="QR Code Pix"
+                                style={{ width: '150px', height: '150px' }}
+                            />
                         </Box>
-                        <TextField
-                            label="Chave Pix"
-                            variant="outlined"
-                            fullWidth
-                            value={detalhesPagamento.chavePix || ''}
-                            onChange={(e) =>
-                                setDetalhesPagamento({ ...detalhesPagamento, chavePix: e.target.value })
-                            }
-                        />
                     </Box>
                 )}
 
-                <Box sx={{ mt: 3 }}>
+                <Box sx={{ mt: 3, width: '40%' }}>
                     <Button
                         variant="contained"
                         color="primary"
-                        fullWidth
+                        size="small"
+                        sx={{
+                            mb: 2,
+                            fontSize: '0.8rem',
+                            width: '100%',
+                        }}
                         onClick={handlePagamento}
                         disabled={loading}
-                        startIcon={loading && <CircularProgress size={20} />}
+                        startIcon={loading && <CircularProgress size={16} />}
                     >
                         {loading ? 'Processando...' : 'Finalizar Pagamento'}
                     </Button>
                 </Box>
 
-                <Button variant="text" fullWidth sx={{ mt: 2 }} onClick={voltarEtapa}>
-                    Voltar
-                </Button>
+                <Box sx={{ width: '40%' }}>
+                    <Button
+                        variant="text"
+                        size="small"
+                        sx={{
+                            mb: 2,
+                            fontSize: '0.8rem',
+                            width: '100%',
+                        }}
+                        onClick={voltarEtapa}
+                    >
+                        Voltar
+                    </Button>
+                </Box>
             </Box>
         </Paper>
     );
-
 };
 
 export default Pagamento;

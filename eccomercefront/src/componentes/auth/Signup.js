@@ -154,7 +154,7 @@ function Signup() {
             const dataWithRole = { ...dataToSend, role: "USER" };
             const response = await authService.signup(dataWithRole);
             console.log('Cadastro bem-sucedido', response);
-            navigate('/login');
+            navigate('/');
         } catch (error) {
             console.error('Falha no cadastro', error);
             setError('Falha ao cadastrar. Por favor, tente novamente.');

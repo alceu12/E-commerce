@@ -56,12 +56,13 @@ public class PedidoController {
             @PathVariable Long id,
             @RequestBody UpdateStatusDTO updateStatusDTO) {
         try {
-            PedidoDTO pedidoAtualizado = pedidoService.atualizarStatusPedido(id, updateStatusDTO.getStatusPedido());
+            PedidoDTO pedidoAtualizado = pedidoService.atualizarStatusPedido(id, updateStatusDTO);
             return ResponseEntity.ok(pedidoAtualizado);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @GetMapping("/usuario/{id}")
     public ResponseEntity<List<PedidoDTO>> obterPedidosPorUsuario(@PathVariable Long id) {

@@ -1,9 +1,8 @@
-// src/componentes/perfil/ConfirmarEndereco.js
-
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Paper, TextField, Alert } from '@mui/material';
-import { getUsuarioById, updateAddressById } from './PedidoService'; // Ajustar o caminho conforme necessário
-import { jwtDecode } from 'jwt-decode'; // Importação padrão
+import { getUsuarioById, updateAddressById } from './PedidoService';
+import { jwtDecode } from 'jwt-decode'; // Ajuste na importação
 import { faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CarrinhoContext } from '../Carrinho/CarrinhoContext';
@@ -16,15 +15,17 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
         rua: '',
         numero: '',
         complemento: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    // Acessar o contexto do carrinho
-    const { limparCarrinho } = useContext(CarrinhoContext);
+    const navigate = useNavigate();
+    const { finalizarCarrinho } = useContext(CarrinhoContext);
 
     useEffect(() => {
-        // Recuperar o ID do usuário do token armazenado no localStorage
         const storedToken = localStorage.getItem('userToken');
         if (storedToken) {
             try {
@@ -44,6 +45,13 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
                                 rua: data.enderecoDTO.rua || '',
                                 numero: data.enderecoDTO.numero || '',
                                 complemento: data.enderecoDTO.complemento || '',
+                                bairro: data.enderecoDTO.bairro || '',
+                                cidade: data.enderecoDTO.cidade || '',
+                                estado: data.enderecoDTO.estado || '',
+                            });
+                        } else {
+                            navigate('/profile', {
+                                state: { message: 'Por favor, cadastre seu endereço antes de continuar.' },
                             });
                         }
                     })
@@ -58,7 +66,45 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
         } else {
             setError('Token de autenticação não encontrado.');
         }
-    }, []);
+    }, [navigate]);
+
+    useEffect(() => {
+        const fetchAddress = async () => {
+            const cep = addressData.cep.replace(/\D/g, '');
+            if (cep.length === 8) {
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await response.json();
+                    if (data.erro) {
+                        setError('CEP não encontrado.');
+                        setAddressData((prevState) => ({
+                            ...prevState,
+                            rua: '',
+                            bairro: '',
+                            cidade: '',
+                            estado: '',
+                        }));
+                    } else {
+                        setError('');
+                        setAddressData((prevState) => ({
+                            ...prevState,
+                            rua: data.logradouro,
+                            bairro: data.bairro,
+                            cidade: data.localidade,
+                            estado: data.uf,
+                        }));
+                    }
+                } catch (err) {
+                    console.error('Erro ao buscar o CEP:', err);
+                    setError('Erro ao buscar o CEP.');
+                }
+            }
+        };
+
+        if (addressData.cep) {
+            fetchAddress();
+        }
+    }, [addressData.cep]);
 
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
@@ -72,17 +118,12 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
         setError('');
         setSuccess('');
 
-        // Validações básicas para os campos de endereço
         if (!addressData.cep.trim()) {
             setError('CEP é obrigatório.');
             return;
         }
         if (!/^\d{5}-?\d{3}$/.test(addressData.cep)) {
             setError('CEP inválido. Deve ter 8 dígitos, opcionalmente com hífen (e.g., 12345-678).');
-            return;
-        }
-        if (!addressData.rua.trim()) {
-            setError('Rua é obrigatória.');
             return;
         }
         if (!addressData.numero.trim()) {
@@ -95,7 +136,6 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
             await updateAddressById(userId, addressData);
             setSuccess('Endereço atualizado com sucesso!');
             setEditAddress(false);
-            // Atualizar o estado do usuário com o novo endereço
             setUsuario((prevUser) => ({
                 ...prevUser,
                 enderecoDTO: { ...addressData },
@@ -107,9 +147,7 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
     };
 
     const handleConfirmAddress = () => {
-        // Limpar o carrinho ao confirmar o endereço
-        limparCarrinho();
-        // Avançar para a próxima etapa
+        finalizarCarrinho();
         avancarEtapa();
     };
 
@@ -134,6 +172,12 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
                         Complemento: {enderecoDTO.complemento || 'N/A'}
                     </Typography>
                     <Typography variant="body2">
+                        Bairro: {enderecoDTO.bairro}
+                    </Typography>
+                    <Typography variant="body2">
+                        Cidade/Estado: {enderecoDTO.cidade} - {enderecoDTO.estado}
+                    </Typography>
+                    <Typography variant="body2">
                         CEP: {enderecoDTO.cep}
                     </Typography>
                 </Box>
@@ -146,14 +190,20 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
                 {!editAddress ? (
                     <Button
                         variant="outlined"
-                        fullWidth
+                        size="small"
+                        sx={{
+                            mt: 2,
+                            display: 'flex',
+                            mb: 2,
+                            width: '30%',
+                        }}
                         onClick={() => setEditAddress(true)}
                         startIcon={<FontAwesomeIcon icon={faEdit} />}
                     >
                         Alterar Endereço
                     </Button>
                 ) : (
-                    <Box component="form" sx={{ mb: 2 }}>
+                    <Box component="form" sx={{ mb: 2, maxWidth: "20%" }}>
                         <TextField
                             label="CEP"
                             variant="outlined"
@@ -163,14 +213,8 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
                             onChange={handleAddressChange}
                             sx={{ mb: 2 }}
                             required
-                            error={
-                                addressData.cep && !/^\d{5}-?\d{3}$/.test(addressData.cep)
-                            }
-                            helperText={
-                                addressData.cep && !/^\d{5}-?\d{3}$/.test(addressData.cep)
-                                    ? 'CEP inválido. Deve ter 8 dígitos, opcionalmente com hífen (e.g., 12345-678).'
-                                    : ''
-                            }
+                            error={addressData.cep.trim() === ''}
+                            helperText={addressData.cep.trim() === '' ? 'CEP é obrigatório.' : ''}
                         />
                         <TextField
                             label="Rua"
@@ -180,30 +224,21 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
                             value={addressData.rua}
                             onChange={handleAddressChange}
                             sx={{ mb: 2 }}
-                            required
-                            error={addressData.rua && !addressData.rua.trim()}
-                            helperText={
-                                addressData.rua && !addressData.rua.trim()
-                                    ? 'Rua é obrigatória.'
-                                    : ''
-                            }
+                            InputProps={{
+                                readOnly: true,
+                            }}
                         />
                         <TextField
                             label="Número"
                             variant="outlined"
                             fullWidth
                             name="numero"
-                            type="number"
                             value={addressData.numero}
                             onChange={handleAddressChange}
                             sx={{ mb: 2 }}
                             required
-                            error={addressData.numero && !addressData.numero.trim()}
-                            helperText={
-                                addressData.numero && !addressData.numero.trim()
-                                    ? 'Número é obrigatório.'
-                                    : ''
-                            }
+                            error={addressData.numero.trim() === ''}
+                            helperText={addressData.numero.trim() === '' ? 'Número é obrigatório.' : ''}
                         />
                         <TextField
                             label="Complemento"
@@ -214,32 +249,60 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
                             onChange={handleAddressChange}
                             sx={{ mb: 2 }}
                         />
+                        <TextField
+                            label="Bairro"
+                            variant="outlined"
+                            fullWidth
+                            name="bairro"
+                            value={addressData.bairro}
+                            onChange={handleAddressChange}
+                            sx={{ mb: 2 }}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                        <TextField
+                            label="Cidade"
+                            variant="outlined"
+                            fullWidth
+                            name="cidade"
+                            value={addressData.cidade}
+                            onChange={handleAddressChange}
+                            sx={{ mb: 2 }}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                        <TextField
+                            label="Estado"
+                            variant="outlined"
+                            fullWidth
+                            name="estado"
+                            value={addressData.estado}
+                            onChange={handleAddressChange}
+                            sx={{ mb: 2 }}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
                         <Button
                             variant="contained"
                             color="primary"
+                            size="small"
+                            sx={{ fontSize: '0.8rem' }}
                             fullWidth
                             onClick={handleSaveAddress}
                             startIcon={<FontAwesomeIcon icon={faSave} />}
-                            sx={{ mb: 2 }}
                         >
                             Salvar Endereço
                         </Button>
                         <Button
                             variant="outlined"
                             color="secondary"
+                            size="small"
+                            sx={{ mt: 1, fontSize: '0.8rem' }}
                             fullWidth
-                            onClick={() => {
-                                setEditAddress(false);
-                                // Resetar os dados de endereço para os originais
-                                setAddressData({
-                                    cep: enderecoDTO.cep || '',
-                                    rua: enderecoDTO.rua || '',
-                                    numero: enderecoDTO.numero || '',
-                                    complemento: enderecoDTO.complemento || '',
-                                });
-                                setError('');
-                                setSuccess('');
-                            }}
+                            onClick={() => setEditAddress(false)}
                         >
                             Cancelar
                         </Button>
@@ -248,16 +311,26 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
                 <Button
                     variant="contained"
                     color="primary"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                    onClick={handleConfirmAddress} // Chama a função que limpa o carrinho e avança
+                    size="small"
+                    sx={{
+                        mt: 2,
+                        display: 'flex',
+                        mb: 2,
+                        width: '30%',
+                    }}
+                    onClick={handleConfirmAddress}
                 >
                     Confirmar Endereço
                 </Button>
                 <Button
                     variant="text"
-                    fullWidth
-                    sx={{ mt: 2 }}
+                    size="small"
+                    sx={{
+                        mt: 2,
+                        display: 'flex',
+                        mb: 2,
+                        width: '30%',
+                    }}
                     onClick={voltarEtapa}
                 >
                     Voltar
@@ -265,7 +338,6 @@ const ConfirmarEndereco = ({ avancarEtapa, voltarEtapa }) => {
             </Box>
         </Paper>
     );
-
 };
 
 export default ConfirmarEndereco;

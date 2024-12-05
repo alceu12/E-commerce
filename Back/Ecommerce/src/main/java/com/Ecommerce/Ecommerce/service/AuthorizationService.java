@@ -6,14 +6,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.Ecommerce.Ecommerce.repository.UsuarioRepository;
+import org.springframework.stereotype.Service;
 
-public class AuthorizationService implements UserDetailsService{
+@Service
+public class AuthorizationService implements UserDetailsService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        
+
         return usuarioRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 

@@ -31,38 +31,100 @@ public class CarrinhoService {
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
+        // Verificar se a quantidade é zero
+        if (quantidade == 0) {
+            throw new RuntimeException("Quantidade não pode ser zero");
+        }
+
         // Verificar se o item já está no carrinho
         Optional<ItemPedido> itemExistente = carrinho.getItens().stream()
                 .filter(item -> item.getProduto().getId().equals(produtoId))
                 .findFirst();
 
+        int estoqueAtual = produto.getEstoque();
+
         if (itemExistente.isPresent()) {
             ItemPedido item = itemExistente.get();
-            item.setQuantidade(item.getQuantidade() + quantidade);
+            int novaQuantidade = item.getQuantidade() + quantidade;
+
+            // Verificar se a nova quantidade é válida
+            if (novaQuantidade < 0) {
+                throw new RuntimeException("Quantidade no carrinho não pode ser negativa");
+            }
+
+            if (quantidade > estoqueAtual) {
+                throw new RuntimeException("Quantidade excede o estoque disponível");
+            }
+
+            // Atualizar ou remover o item do carrinho
+            if (novaQuantidade == 0) {
+                carrinho.getItens().remove(item); // Remove o item se a quantidade for zero
+            } else {
+                item.setQuantidade(novaQuantidade);
+            }
         } else {
+            if (quantidade < 0) {
+                throw new RuntimeException("Não é possível remover um produto que não está no carrinho");
+            }
+
+            if (quantidade > estoqueAtual) {
+                throw new RuntimeException("Quantidade excede o estoque disponível");
+            }
+
+            // Criar um novo item de pedido
             ItemPedido novoItem = new ItemPedido();
             novoItem.setProduto(produto);
             novoItem.setQuantidade(quantidade);
             novoItem.setPrecoUnitario(produto.getValor());
 
+            // Adicionar o novo item ao carrinho
             carrinho.getItens().add(novoItem);
         }
 
-        // Atualizar o total
+        // Atualizar o estoque do produto corretamente
+        int novoEstoque = estoqueAtual - quantidade;
+        if (novoEstoque < 0) {
+            throw new RuntimeException("Erro: Estoque inconsistente após a atualização");
+        }
+        produto.setEstoque(novoEstoque);
+        produtoRepository.save(produto);
+
+        // Atualizar o total do carrinho
         carrinho.atualizarTotal();
         carrinhoRepository.save(carrinho);
 
         return CarrinhoMapper.toDTO(carrinho);
     }
 
+
+
+
     public CarrinhoDTO removerProduto(Long produtoId) {
         Carrinho carrinho = carrinhoRepository.findAll().stream()
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
 
+        carrinho.getItens().stream()
+                .filter(item -> item.getProduto().getId().equals(produtoId))
+                .findFirst()
+                .ifPresent(item -> {
+                    Produto produto = produtoRepository.findById(produtoId)
+                            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                    produto.setEstoque(produto.getEstoque() + item.getQuantidade());
+                    produtoRepository.save(produto);
+                });
         carrinho.getItens().removeIf(item -> item.getProduto().getId().equals(produtoId));
         carrinho.atualizarTotal();
         carrinhoRepository.save(carrinho);
+
+        // tem q pegar a quantidade do item removido e adicionar ao estoque
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        // quantidade do item removido
+
+
+        produtoRepository.save(produto);
+
 
         return CarrinhoMapper.toDTO(carrinho);
     }
@@ -71,6 +133,14 @@ public class CarrinhoService {
         Carrinho carrinho = carrinhoRepository.findAll().stream()
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
+
+        carrinho.getItens().forEach(item -> {
+            Produto produto = produtoRepository.findById(item.getProduto().getId())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+            produto.setEstoque(produto.getEstoque() + item.getQuantidade());
+            produtoRepository.save(produto);
+        });
+
 
         carrinho.getItens().clear();
         carrinho.setTotal(0.0);
@@ -86,6 +156,19 @@ public class CarrinhoService {
 
         return CarrinhoMapper.toDTO(carrinho);
     }
+
+    public CarrinhoDTO finalizarCarrinho() {
+        Carrinho carrinho = carrinhoRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
+
+        carrinho.getItens().clear();
+        carrinho.setTotal(0.0);
+        carrinhoRepository.save(carrinho);
+
+        return CarrinhoMapper.toDTO(carrinho);
+    }
+
     public CarrinhoDTO alterarQuantidade(Long carrinhoId, Long produtoId, int quantidade) {
         Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
                 .orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));

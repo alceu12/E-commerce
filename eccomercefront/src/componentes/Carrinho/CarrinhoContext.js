@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { getCarrinhoFromAPI, adicionarProdutoNaAPI, removerProdutoDaAPI, limparCarrinhoNaAPI } from './CarrinhoService';
+import { getCarrinhoFromAPI, adicionarProdutoNaAPI, removerProdutoDaAPI, limparCarrinhoNaAPI, finalizarCarrinhoNaAPI } from './CarrinhoService';
 
 export const CarrinhoContext = createContext();
 
@@ -37,6 +37,13 @@ export const CarrinhoProvider = ({ children }) => {
             console.error('Erro ao limpar carrinho:', error);
         });
     };
+    const finalizarCarrinho = () => {
+        finalizarCarrinhoNaAPI().then((data) => {
+            setCarrinho(data);
+        }).catch((error) => {
+            console.error('Erro ao finalizar carrinho:', error);
+        });
+    }
 
     const alterarQuantidade = (produtoId, novaQuantidade) => {
         if (novaQuantidade <= 0) return;
@@ -51,7 +58,7 @@ export const CarrinhoProvider = ({ children }) => {
     };
 
     return (
-        <CarrinhoContext.Provider value={{ carrinho, adicionarProduto, removerProduto, limparCarrinho, alterarQuantidade }}>
+        <CarrinhoContext.Provider value={{ carrinho, adicionarProduto, removerProduto, limparCarrinho, alterarQuantidade, finalizarCarrinho }}>
             {children}
         </CarrinhoContext.Provider>
     );

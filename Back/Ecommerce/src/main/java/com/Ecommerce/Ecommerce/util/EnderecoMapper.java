@@ -14,7 +14,11 @@ public class EnderecoMapper {
                 endereco.getCep(),
                 endereco.getRua(),
                 endereco.getNumero(),
-                endereco.getComplemento());
+                endereco.getComplemento(),
+                endereco.getBairro(),
+                endereco.getCidade(),
+                endereco.getEstado()
+        );
     }
 
     public static Endereco toEntity(EnderecoDTO dto) {
@@ -28,6 +32,9 @@ public class EnderecoMapper {
         endereco.setRua(dto.getRua());
         endereco.setNumero(dto.getNumero());
         endereco.setComplemento(dto.getComplemento());
+        endereco.setBairro(dto.getBairro());
+        endereco.setCidade(dto.getCidade());
+        endereco.setEstado(dto.getEstado());
 
         return endereco;
     }

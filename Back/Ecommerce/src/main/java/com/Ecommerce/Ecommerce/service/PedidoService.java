@@ -7,10 +7,14 @@ import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.Ecommerce.Ecommerce.dto.EnderecoDTO;
 import com.Ecommerce.Ecommerce.dto.ItemPedidoDTO;
+import com.Ecommerce.Ecommerce.dto.UpdateStatusDTO;
 import com.Ecommerce.Ecommerce.entity.*;
 import com.Ecommerce.Ecommerce.repository.*;
+import com.Ecommerce.Ecommerce.util.EnderecoMapper;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +37,10 @@ public class PedidoService {
 
     @Autowired
     private ItemPedidoRepository itemPedidoRepository;
+
+    @Autowired
+    private EnderecoRepository enderecoRepository;
+
 
     public PedidoDTO criarPedido(PedidoDTO pedidoDTO) {
         Pedido pedido = new Pedido();
@@ -80,6 +88,27 @@ public class PedidoService {
         pedido.setDataPedido(LocalDate.now());
         pedido.setDataEntrega(null);
 
+        Endereco enderecoUsuario = usuario.getEndereco();
+        if (enderecoUsuario == null) {
+            throw new RuntimeException("Usuário não possui um endereço cadastrado.");
+        }
+
+        // Clonar o endereço do usuário
+        Endereco novoEndereco = new Endereco();
+        novoEndereco.setRua(enderecoUsuario.getRua());
+        novoEndereco.setNumero(enderecoUsuario.getNumero());
+        novoEndereco.setComplemento(enderecoUsuario.getComplemento());
+        novoEndereco.setBairro(enderecoUsuario.getBairro());
+        novoEndereco.setCidade(enderecoUsuario.getCidade());
+        novoEndereco.setEstado(enderecoUsuario.getEstado());
+        novoEndereco.setCep(enderecoUsuario.getCep());
+        // Se houver outros campos, copie-os também
+
+        // Salvar o novo endereço
+        enderecoRepository.save(novoEndereco);
+
+        // Definir o novo endereço de entrega no pedido
+        pedido.setEnderecoEntrega(novoEndereco);
         // Salvar o pedido
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
@@ -125,18 +154,27 @@ public class PedidoService {
         }
     }
 
-    public PedidoDTO atualizarStatusPedido(Long id, StatusPedido statusPedido) {
-        Pedido pedido = pedidoRepository.findById(id)
+    @Transactional
+    public PedidoDTO atualizarStatusPedido(Long id, UpdateStatusDTO updateStatusDTO) {
+        Pedido pedidoExistente = pedidoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
 
-        pedido.setStatusPedido(statusPedido);
-        Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+        // Força o carregamento dos ItemPedido para evitar que sejam removidos
+        pedidoExistente.getItemPedido().size();
 
+        // Atualiza o status usando o método do mapper
+        PedidoMapper.updateStatusFromDTO(pedidoExistente, updateStatusDTO);
+
+        // Salva o pedido atualizado
+        Pedido pedidoAtualizado = pedidoRepository.save(pedidoExistente);
+
+        // Converte a entidade atualizada para DTO e retorna
         return PedidoMapper.toDTO(pedidoAtualizado);
     }
 
+
     public List<PedidoDTO> obterPedidosPorUsuario(Long usuarioId) {
-        return pedidoRepository.findAllByUsuarioIdOrderByDataPedidoDesc(usuarioId).stream()
+        return pedidoRepository.findAllByUsuarioIdOrderByIdDesc(usuarioId).stream()
                 .map(PedidoMapper::toDTO)
                 .collect(Collectors.toList());
     }
