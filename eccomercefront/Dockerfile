@@ -19,6 +19,12 @@ RUN npm run build
 # Etapa 2: Servir o aplicativo com Nginx
 FROM nginx:alpine
 
+# Remover a configuração padrão do Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copiar a configuração personalizada do Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copiar os arquivos de build para o diretório padrão do Nginx
 COPY --from=build /app/build /usr/share/nginx/html
 

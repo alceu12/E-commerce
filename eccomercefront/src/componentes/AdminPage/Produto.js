@@ -17,7 +17,6 @@ import {
     createProduct,
     getProducts,
     updateProduct,
-    deleteProduct,
 } from "./ServiceAdmin/ProdutoService";
 import { getCategories } from "./ServiceAdmin/CategoriaService";
 import { DataGrid } from "@mui/x-data-grid";
@@ -77,14 +76,7 @@ const Produto = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        try {
-            await deleteProduct(id);
-            fetchProdutos();
-        } catch (error) {
-            console.error("Erro ao deletar o produto", error);
-        }
-    };
+
 
     const fetchProdutos = async () => {
         try {

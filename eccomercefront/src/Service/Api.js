@@ -3,7 +3,7 @@ import qs from 'qs';
 import { jwtDecode } from 'jwt-decode';
 import { Navigate } from 'react-router-dom';
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'https://e-commerce-07vh.onrender.com/',
   paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
 });
 

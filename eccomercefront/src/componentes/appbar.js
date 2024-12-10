@@ -37,30 +37,28 @@ function ResponsiveAppBar() {
         // Verifica se o usuário está logado ao montar o componente
         const storedToken = localStorage.getItem('userToken');
         if (storedToken) {
-            try {
-                const decodedToken = jwtDecode(storedToken);
-                // Verifica se o token não expirou
-                const currentTime = Date.now() / 1000;
-                if (decodedToken.exp < currentTime) {
-                    // Token expirado
-                    handleLogout();
-                } else {
-                    setIsLoggedIn(true);
-                    setUser({
-                        id: decodedToken.id,
-                        email: decodedToken.email,
-                        // Adicione outros campos conforme necessário
-                    });
-                }
-            } catch (error) {
-                console.error('Erro ao decodificar o token:', error);
-                handleLogout();
+          try {
+            const decodedToken = jwtDecode(storedToken);
+            // Verifica se o token não expirou
+            const currentTime = Date.now() / 1000;
+            if (decodedToken.exp < currentTime) {
+              // Token expirado
+            } else {
+              setIsLoggedIn(true);
+              setUser({
+                id: decodedToken.id,
+                email: decodedToken.email,
+                // Adicione outros campos conforme necessário
+              });
             }
+          } catch (error) {
+            console.error('Erro ao decodificar o token:', error);
+          }
         } else {
-            setIsLoggedIn(false);
-            setUser(null);
+          setIsLoggedIn(false);
+          setUser(null);
         }
-    }, []);
+      }, []);
 
     useEffect(() => {
         const total = carrinho && carrinho.itens
@@ -91,14 +89,7 @@ function ResponsiveAppBar() {
         setIsCarrinhoOpen(open);
     };
 
-    const handleLogout = () => {
-        // Limpa o localStorage e atualiza o estado de autenticação
-        localStorage.removeItem('userToken');
-        setIsLoggedIn(false);
-        setUser(null);
-        handleCloseUserMenu();
-        navigate('/login');
-    };
+
 
     // Definir as opções de menu com base no estado de autenticação
     const settings = isLoggedIn
@@ -115,7 +106,6 @@ function ResponsiveAppBar() {
                 navigate('/pedidos'); // Link correto para "Meus Pedidos"
                 break;
             case 'Sair':
-                handleLogout();
                 break;
             case 'Entrar':
                 navigate('/login');

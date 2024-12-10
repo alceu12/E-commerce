@@ -260,6 +260,7 @@ const PedidoDetails = () => {
         );
     }
 
+
     const {
         itemPedidoDTO,
         historicoStatus,
@@ -272,6 +273,7 @@ const PedidoDetails = () => {
     } = pedido;
     const date = DateTime.fromFormat(dataPedido, 'yyyy-MM-dd', { zone: 'America/Sao_Paulo' });
     const formattedDate = date.toFormat('dd/MM/yyyy');
+
     return (
         <Box display="flex" flexDirection="column" minHeight="100vh">
             {/* AppBar */}

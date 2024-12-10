@@ -14,8 +14,7 @@ Este é um projeto de e-commerce desenvolvido com **Java Spring Boot** no backen
 ### Produtos
 - CRUD de produtos (Admin).
 - Listagem e visualização de detalhes de produtos.
-- Filtros e busca avançada por produtos (categoria, preço, avaliações).
-- Avaliações e comentários de usuários sobre produtos.
+- Filtros e busca avançada por produtos (categoria, preço).
 
 ### Carrinho de Compras
 - Adicionar/remover itens ao carrinho.
@@ -24,7 +23,6 @@ Este é um projeto de e-commerce desenvolvido com **Java Spring Boot** no backen
 
 ### Pedido
 - Finalização de pedido com resumo de itens.
-- Integração com métodos de pagamento (em desenvolvimento).
 - Histórico de pedidos com status atualizado (Processando, Enviado, Entregue).
   
 ### Cupons de Desconto

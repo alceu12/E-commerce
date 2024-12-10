@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -27,9 +27,6 @@ const ProdutoDetalhes = () => {
   const [editedProduto, setEditedProduto] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
 
-  useEffect(() => {
-    fetchProduto();
-  }, []);
 
   const fetchProduto = async () => {
     try {
