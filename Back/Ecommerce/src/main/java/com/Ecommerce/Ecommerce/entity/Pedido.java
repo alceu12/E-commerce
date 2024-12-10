@@ -27,12 +27,20 @@ public class Pedido {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_pedido_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "pedido_id")
     private List<ItemPedido> itemPedido;
+
 
     @ManyToOne
     @JoinColumn(name = "cupom_id")
     private Cupom cupomAplicado;
+
+    @JoinColumn(name = "endereco_id", referencedColumnName = "id")
+    @OneToOne
+    private Endereco enderecoEntrega;
+
+
+
 
 }

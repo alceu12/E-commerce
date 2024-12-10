@@ -79,8 +79,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/carrinho/*").permitAll()
                         .requestMatchers(HttpMethod.GET,"/cupons/validar/*").permitAll()
                         .requestMatchers(HttpMethod.POST,"/pedidos").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/cupons/*").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/produtos/*").hasRole("ADMIN")
 
 
                         .anyRequest().permitAll()

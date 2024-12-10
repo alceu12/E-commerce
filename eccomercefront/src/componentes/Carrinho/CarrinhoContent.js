@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 const CarrinhoContent = () => {
     const navigate = useNavigate();
     const { carrinho, removerProduto, limparCarrinho, alterarQuantidade } = useContext(CarrinhoContext);
+    const isLogged = localStorage.getItem('userToken');
+
 
     if (!carrinho || carrinho.itens.length === 0) {
         return (
@@ -32,8 +34,18 @@ const CarrinhoContent = () => {
     }
 
     const calcularTotal = () => {
-        return carrinho.total.toFixed(2);
+        const total = carrinho.total;
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total);
     };
+    if (isLogged) {
+        <Button variant="contained" color="primary" fullWidth onClick={() => navigate('/finalizar-compra')}>
+            Finalizar Compra
+        </Button>
+    } else {
+        <Button variant="contained" color="primary" fullWidth onClick={() => navigate('/login')}>
+            Finalizar Compra
+        </Button>
+    }
 
     return (
         <Box sx={{ p: 2 }}>
@@ -59,7 +71,7 @@ const CarrinhoContent = () => {
                                 secondary={
                                     <>
                                         <Typography variant="body2" color="text.secondary">
-                                            Preço unitário: R$ {parseFloat(item.precoUnitario).toFixed(2)}
+                                            Preço unitário: R$ {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.precoUnitario)}
                                         </Typography>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                                             <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
@@ -83,15 +95,22 @@ const CarrinhoContent = () => {
                 ))}
             </List>
             <Box sx={{ mt: 2 }}>
-                <Typography variant="h6">Total: R$ {calcularTotal()}</Typography>
-                <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/finalizar-compra')}>
-                    Finalizar Compra
-                </Button>
+                <Typography variant="h6">Total: {calcularTotal()}</Typography>
+                {isLogged ? (
+                    <Button variant="contained" color="primary" fullWidth onClick={() => navigate('/finalizar-compra')}>
+                        Finalizar Compra
+                    </Button>
+                ) : (
+                    <Button variant="contained" color="primary" fullWidth onClick={() => navigate('/login')}>
+                        Finalizar Compra
+                    </Button>
+                )}
+
                 <Button variant="text" color="secondary" fullWidth onClick={limparCarrinho}>
                     Limpar Carrinho
                 </Button>
             </Box>
-        </Box>
+        </Box >
     );
 };
 

@@ -5,6 +5,7 @@ import AppBar from "./componentes/appbar";
 import Produtos from "./produtos/Produto";
 import Filtros from "./componentes/Filtros/Filtros";
 import Footer from "./componentes/Footer";
+import cupomImage from "./cupom.png";
 
 const Homecliente = () => {
   const [produtos, setProdutos] = useState([]);
@@ -24,10 +25,16 @@ const Homecliente = () => {
         <Grid item xs={12}>
           <Card>
             <CardContent>
-              <Typography variant="h5">Informações Importantes</Typography>
-              <Typography variant="body1">
-                Aqui você pode colocar um texto ou informações importantes para o cliente.
+              <Typography
+                variant="body1"
+                sx={{
+                  textAlign: 'center',
+                  padding: 2,
+                }}
+              >
+                <img src={cupomImage} alt="Logo" />
               </Typography>
+
             </CardContent>
           </Card>
         </Grid>
@@ -57,11 +64,11 @@ const Homecliente = () => {
         {/* Linha 4: Footer */}
         <Grid item xs={12}>
           <Box sx={{ height: 100, textAlign: "center", marginTop: 2 }}>
-           <Footer />
+            <Footer />
           </Box>
         </Grid>
       </Grid>
-    </div>
+    </div >
   );
 };
 
