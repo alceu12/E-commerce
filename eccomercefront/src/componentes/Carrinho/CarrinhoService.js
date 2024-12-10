@@ -20,3 +20,7 @@ export const removerProdutoDaAPI = (produtoId) => {
 export const limparCarrinhoNaAPI = () => {
     return api.delete('/carrinho/limpar').then((response) => response.data);
 };
+
+export const finalizarCarrinhoNaAPI = () => {
+    return api.delete('/carrinho/finalizar').then((response) => response.data);
+};

@@ -18,10 +18,10 @@ import {
     Badge,
     Drawer
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AdbIcon from '@mui/icons-material/Adb';
 import CarrinhoContent from '../componentes/Carrinho/CarrinhoContent';
+import Icon from './icons/Logo';
 
 function ResponsiveAppBar() {
     const { carrinho } = useContext(CarrinhoContext);
@@ -126,14 +126,14 @@ function ResponsiveAppBar() {
     };
 
     // Definir as páginas padrão
-    const pages = ['Produtos', 'Categorias', 'Contato'];
+
 
     return (
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     {/* Logo para telas maiores */}
-                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                    <Icon width="5%" height="5%" />
                     <Typography
                         variant="h6"
                         noWrap
@@ -162,7 +162,7 @@ function ResponsiveAppBar() {
                             onClick={handleOpenNavMenu}
                             color="inherit"
                         >
-                            <MenuIcon />
+                            <img src={Icon} alt="Logo" />
                         </IconButton>
                         <Menu
                             id="menu-appbar"
@@ -180,7 +180,7 @@ function ResponsiveAppBar() {
                             onClose={handleCloseNavMenu}
                             sx={{ display: { xs: 'block', md: 'none' } }}
                         >
-                            {pages.map((page) => (
+                            {/*{pages.map((page) => (
                                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                                     <Typography sx={{ textAlign: 'center' }}>
                                         <Link
@@ -192,6 +192,7 @@ function ResponsiveAppBar() {
                                     </Typography>
                                 </MenuItem>
                             ))}
+                                */}
                         </Menu>
                     </Box>
 
@@ -218,7 +219,7 @@ function ResponsiveAppBar() {
 
                     {/* Menu para telas maiores */}
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                        {pages.map((page) => (
+                        {/* {pages.map((page) => (
                             <Button
                                 key={page}
                                 onClick={handleCloseNavMenu}
@@ -229,6 +230,7 @@ function ResponsiveAppBar() {
                                 {page}
                             </Button>
                         ))}
+                            */}
                     </Box>
 
                     {/* Ícones de Carrinho e Usuário */}

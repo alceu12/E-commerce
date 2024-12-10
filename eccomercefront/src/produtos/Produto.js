@@ -74,8 +74,8 @@ const Produtos = ({ produtos: produtosProps }) => {
                                 </Typography>
                                 <Box sx={{ mt: 2 }}>
                                     <Typography variant="h5" color="primary">
-                                        {produto.valor !== undefined
-                                            ? `R$ ${parseFloat(produto.valor).toFixed(2)}`
+                                        {produto.valor !== undefined && produto.valor !== null
+                                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(produto.valor)
                                             : 'Preço indisponível'}
                                     </Typography>
                                 </Box>
